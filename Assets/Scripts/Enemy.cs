@@ -9,12 +9,7 @@ public class Enemy : MonoBehaviour
 
     [Header("적 몬스터 스탯")]    
     [SerializeField] private float moveSpeed = 5f;
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.blue;        
-    }
-
+    
     private void Start()
     {
         trsPlayer = GameObject.Find("Player").transform;
@@ -22,7 +17,7 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        Moving();
+        //Moving();
     }
 
     /// <summary>
@@ -32,11 +27,15 @@ public class Enemy : MonoBehaviour
     {
         Vector3 direction = trsPlayer.position - transform.position;
         transform.position += new Vector3(direction.x, direction.y, 0) * moveSpeed * Time.deltaTime;
+        
+        if (direction.x < 0)
+        {
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
+
+        else if (direction.x > 0)
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+        }
     }
 }
-    #region 필요한 기능
-    /*
-    1. 플레이어의 위치를 탐지하고 추적
-    2. 일정거리에 들어오면 일반 공격
-    */
-    #endregion

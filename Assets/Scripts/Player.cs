@@ -8,11 +8,12 @@ using TMPro;
 public class Player : MonoBehaviour
 {
     //캐릭터 기본 설정
-    private float horizontal;
-    private float vertical;
-    private Camera mainCam;
-    private Vector3 posPlayer;
-    private Transform trsPlayer;
+    private float moveX; //x축 움직임
+    private float moveY; //y축 움직임
+    private Camera mainCam; //카메라
+    private Vector3 posTarget; //타겟(마우스 커서)의 포지션
+    [SerializeField] private Vector3 direction; //스킬샷 방향
+    private Quaternion rotTarget;
 
     [Serializable] //플레이어 스킬 등록
     public class PlayerSkill
@@ -28,6 +29,9 @@ public class Player : MonoBehaviour
     [Header("플레이어 스킬 셋팅")]
     [SerializeField] private List<PlayerSkill> playerSkills;
     [SerializeField] private List<TMP_Text> coolTimes;
+    [SerializeField] private GameObject fire01;
+    [SerializeField] private Transform curSor;
+    [SerializeField] private Transform objDynamic;
 
     [Header("플레이어 스탯")]
     [SerializeField] private float moveSpeed = 10f;
@@ -35,11 +39,11 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         mainCam = Camera.main;
-        trsPlayer = gameObject.transform;
     }
 
     private void Update()
     {
+        CheckMouse();
         Moving();
         Turning();
         PlayerCamera();
@@ -52,9 +56,30 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Moving()
     {
-        horizontal = Input.GetAxisRaw("Horizontal"); //수평
-        vertical = Input.GetAxisRaw("Vertical"); //수직
-        transform.position += new Vector3(horizontal, vertical, 0f) * Time.deltaTime * moveSpeed;
+        moveX = Input.GetAxisRaw("Horizontal"); //수평
+        moveY = Input.GetAxisRaw("Vertical"); //수직
+        transform.position += new Vector3(moveX, moveY, 0f) * Time.deltaTime * moveSpeed;
+    }
+
+    /// <summary>
+    /// 마우스 확인
+    /// </summary>
+    private void CheckMouse()
+    {
+        Vector3 posMouse = Input.mousePosition; //마우스 Position값 저장
+                          //Input.mousePosition은 Game화면(1920 * 1080) 크기로 적용
+        posMouse.z = -mainCam.transform.position.z;
+        Vector3 mouseWorldPos = mainCam.ScreenToWorldPoint(posMouse);
+        //화면 비율로 저장한 마우스 포지션 값을 카메라 화면에 있는 월드 좌표값으로 적용
+        //x, y 좌표값은 월드 좌표로 적용이 되고 z값은 카메라의 position.z값을 적용
+        //위 z값에서 카메라의 z 포지션 값을 미리 빼서 마우스 월드 좌표값의 z값을 0으로 맞춤
+        posTarget = mouseWorldPos; //타겟좌표 저장
+        curSor.position = posTarget; //커서 오브젝트의 포지션을 타겟 좌표로 저장
+        direction = posTarget - transform.position; //스킬샷 방향 설정
+
+        Quaternion rotDirection = Quaternion.LookRotation(direction); //방향 설정
+        Quaternion eulerZ = Quaternion.Euler(0f, 0f, rotDirection.z); //설정한 방향의 z각도 값을 가져옴
+        rotTarget = rotDirection;
     }
 
     /// <summary>
@@ -64,13 +89,13 @@ public class Player : MonoBehaviour
     {
         Vector3 scale = transform.localScale;
 
-        if (horizontal < 0f)
+        if (moveX < 0f)
         {
             scale = new Vector3(1, 1, 1);
             transform.localScale = scale;
         }
 
-        else if (horizontal > 0f)
+        else if (moveX > 0f)
         {
             scale = new Vector3(-1, 1, 1);
             transform.localScale = scale;
@@ -82,7 +107,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void PlayerCamera()
     {
-        posPlayer = transform.position;
+        Vector3 posPlayer = transform.position;
         mainCam.gameObject.transform.position = new Vector3(posPlayer.x, posPlayer.y, posPlayer.z - 10);
     }
 
@@ -98,8 +123,7 @@ public class Player : MonoBehaviour
             {
                 if (Input.GetKeyDown(playerSkills[iNum01].skillKey))
                 {
-                    Debug.Log($"스킬 {playerSkills[iNum01].skillName}을(를) 사용했습니다.");
-                    //PlayerSkills(playerSkills[iNum01].skillKey));
+                    PlayerSkills(playerSkills[iNum01].skillKey);
                     playerSkills[iNum01].skillActive = false;
                 }
             }
@@ -114,11 +138,16 @@ public class Player : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 플레이어 스킬을 등록하는 함수
+    /// </summary>
+    /// <param 스킬 키코드="_skillKey">스킬 키코드</param>
     private void PlayerSkills(KeyCode _skillKey)
     {
-        switch ( _skillKey )
+        switch (_skillKey)
         {
             case KeyCode.Q:
+                Debug.Log("Q스킬 발동");
                 break;
 
             case KeyCode.E:
@@ -127,9 +156,12 @@ public class Player : MonoBehaviour
                 break;
 
             case KeyCode.Mouse0:
+                Debug.Log("마우스 왼쪽 스킬 발동");
+                GameObject obj = Instantiate(fire01, transform.position, rotTarget, objDynamic);
                 break;
 
             case KeyCode.Mouse1:
+                Debug.Log("마우스 오른쪽 스킬 발동");
                 break;
         }
     }

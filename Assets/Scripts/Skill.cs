@@ -8,6 +8,7 @@ public class Skill : MonoBehaviour
     [SerializeField] private float moveSpeed = 3f;
 
     private bool isStop = false;
+    private Vector3 direction;
 
     private void Update()
     {
@@ -18,7 +19,17 @@ public class Skill : MonoBehaviour
     {
         if (isStop)
         { return; }
-        transform.position += new Vector3(1, 0, 0) * moveSpeed * Time.deltaTime;
+        transform.position += direction.normalized * moveSpeed * Time.deltaTime;
+    }
+
+    public void PSetDirection(Vector3 _direction)
+    {
+        direction = _direction;
+    }
+
+    public Vector3 PGetDirection()
+    {
+        return direction;
     }
 
     public void BStopMoving()

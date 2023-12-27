@@ -76,10 +76,8 @@ public class Player : MonoBehaviour
         posTarget = mouseWorldPos; //타겟좌표 저장
         curSor.position = posTarget; //커서 오브젝트의 포지션을 타겟 좌표로 저장
         direction = posTarget - transform.position; //스킬샷 방향 설정
-
-        Quaternion rotDirection = Quaternion.LookRotation(direction); //방향 설정
-        Quaternion eulerZ = Quaternion.Euler(0f, 0f, rotDirection.z); //설정한 방향의 z각도 값을 가져옴
-        rotTarget = rotDirection;
+        
+        rotTarget = Quaternion.FromToRotation(Vector3.right, direction);
     }
 
     /// <summary>
@@ -147,7 +145,7 @@ public class Player : MonoBehaviour
         switch (_skillKey)
         {
             case KeyCode.Q:
-                Debug.Log("Q스킬 발동");
+                Debug.Log("Q스킬 발동");                
                 break;
 
             case KeyCode.E:
@@ -156,8 +154,9 @@ public class Player : MonoBehaviour
                 break;
 
             case KeyCode.Mouse0:
-                Debug.Log("마우스 왼쪽 스킬 발동");
                 GameObject obj = Instantiate(fire01, transform.position, rotTarget, objDynamic);
+                Skill sc = obj.GetComponent<Skill>();
+                sc.PSetDirection(direction);
                 break;
 
             case KeyCode.Mouse1:

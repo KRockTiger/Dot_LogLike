@@ -35,10 +35,13 @@ public class Player : MonoBehaviour
 
     [Header("플레이어 스탯")]
     [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private float maxHP = 10f;
+    [SerializeField] private float curHP;
 
     private void Awake()
     {
         mainCam = Camera.main;
+        curHP = maxHP;
     }
 
     private void Update()
@@ -205,8 +208,8 @@ public class Player : MonoBehaviour
     /// <summary>
     /// 플레이어 피격하는 기능
     /// </summary>
-    public void PHit()
+    public void PHit(float _damage)
     {
-        Debug.Log("공격을 당했습니다.");
+        curHP -= _damage;
     }
 }

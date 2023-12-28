@@ -17,6 +17,10 @@ public class Skill : MonoBehaviour
         if (collision.gameObject.tag == "Enemy")
         {
             Enemy enemy = collision.GetComponent<Enemy>();
+            if (enemy.PIsSpawnTime()) //몬스터가 스폰 중일 경우
+            {
+                return;
+            }
             enemy.PHit(direction, damage);
             Destroy(gameObject);
         }

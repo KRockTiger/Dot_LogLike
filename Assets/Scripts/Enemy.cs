@@ -10,11 +10,13 @@ public class Enemy : MonoBehaviour
     private Transform trsPlayer; //플레이어 위치
     private bool isHitting = false; //넉백 확인
     private bool isDeath = false; //사망 확인
+    private bool isSpawnTime = true; //스폰 확인
     private Vector3 enemyScale;
     private Vector3 hitDirection; //넉백 방향
     private SpriteRenderer spriteRenderer;
     private Color defColor; //현 몬스터의 컬러
     private Color hitColor = Color.red; //피격 당했을 때 나타내는 컬러
+    private Color spawnColor; //스폰타임일 때 컬러
 
     [Header("적 몬스터 스탯")]
     [SerializeField] private float moveSpeed = 5f;
@@ -35,13 +37,26 @@ public class Enemy : MonoBehaviour
     {
         trsPlayer = GameObject.Find("Player").transform;
         defColor = spriteRenderer.color;
+        spawnColor = new Color(defColor.r, defColor.g, defColor.b, 0.5f);
+        spriteRenderer.color = spawnColor;
         gameManager = GameManager.Instance;
     }
 
     private void Update()
     {
+        if (isSpawnTime)
+        {
+            Invoke("SpawnTimeEnd", 1f);
+            return;
+        }
         Moving();
         CheckDeath();
+    }
+
+    private void SpawnTimeEnd()
+    {
+        spriteRenderer.color = defColor;
+        isSpawnTime = false;
     }
 
     /// <summary>
@@ -119,5 +134,10 @@ public class Enemy : MonoBehaviour
         hitDirection = _direction; //피격 방향 저장
         hitTime = 0.2f; //피격 시간
         isHitting = true; //피격 판정 키기
+    }
+
+    public bool PIsSpawnTime()
+    {
+        return isSpawnTime;
     }
 }

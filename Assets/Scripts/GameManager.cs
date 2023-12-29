@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float spawnTimer; //실시간 타이머
 
     [Header("소환 관리")]
+    [SerializeField] private bool useSpawn = false;
     [SerializeField] private Transform objDynamic;
     [SerializeField] private Transform[] spawnPoints; //스폰할 몬스터 구역
     [SerializeField] private int spawnMin = 3; //스폰하는 몬스터 수의 최솟값
@@ -37,6 +38,8 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         coinText.text = coin.ToString() + "$";
+        if (!useSpawn)
+        { return; }
         SpawnCountDown();
     }
 

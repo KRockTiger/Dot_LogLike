@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour
     private Transform trsPlayer; //플레이어 위치
     private bool isHitting = false; //넉백 확인
     private bool isDeath = false; //사망 확인
-    private bool isSpawnTime = true; //스폰 확인
+    [SerializeField] private bool isSpawnTime = true; //스폰 확인
     private Vector3 enemyScale;
     private Vector3 hitDirection; //넉백 방향
     private SpriteRenderer spriteRenderer;
@@ -26,34 +26,67 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float hitTime = 0f; //넉백 시간
     [SerializeField] private int haveCoin = 10;
 
+    [Header("테스트용")]
+    [SerializeField] private bool skillTest = false;
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+            Player sc = collision.GetComponent<Player>();
+            sc.PHit(damage);
+        }
+    }
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         enemyScale = transform.localScale;
         curHP = maxHP;
+
+        int randDirenction = Random.Range(0, 2);
+        if (randDirenction == 0)
+        {
+            transform.localScale = new Vector3(-enemyScale.x, enemyScale.y, 0);
+        }
+
+        else
+        {
+            transform.localScale = new Vector3(enemyScale.x, enemyScale.y, 0);
+        }
     }
 
     private void Start()
     {
+        gameManager = GameManager.Instance;
         trsPlayer = GameObject.Find("Player").transform;
         defColor = spriteRenderer.color;
+
+        if (!isSpawnTime)
+        {
+            return;
+        }
         spawnColor = new Color(defColor.r, defColor.g, defColor.b, 0.5f);
         spriteRenderer.color = spawnColor;
-        gameManager = GameManager.Instance;
     }
 
     private void Update()
     {
+        if (skillTest)
+        { return; }
+
         if (isSpawnTime)
         {
-            Invoke("SpawnTimeEnd", 1f);
+            Invoke("SpawnTime", 1f);
             return;
         }
         Moving();
         CheckDeath();
     }
 
-    private void SpawnTimeEnd()
+    /// <summary>
+    /// 스폰하는 시간
+    /// </summary>
+    private void SpawnTime()
     {
         spriteRenderer.color = defColor;
         isSpawnTime = false;
@@ -70,12 +103,12 @@ public class Enemy : MonoBehaviour
         {
             transform.position += new Vector3(direction.x, direction.y, 0).normalized * moveSpeed * Time.deltaTime;
 
-            if (direction.x < 0)
+            if (direction.x < 0 && transform.localScale.x > 0)
             {
                 transform.localScale = new Vector3(-enemyScale.x, enemyScale.y, 1);
             }
 
-            else if (direction.x > 0)
+            else if (direction.x > 0 && transform.localScale.x < 0)
             {
                 transform.localScale = new Vector3(enemyScale.x, enemyScale.y, 1);
             }
@@ -130,6 +163,12 @@ public class Enemy : MonoBehaviour
     /// <param 피격 방향="_direction">피격을 당한 방향을 나타냄</param>
     public void PHit(Vector3 _direction, float _damage)
     {
+        if (skillTest)
+        {
+            Debug.Log("몬스터가 스킬 영향을 받았습니다.");
+            return;
+        }
+
         curHP -= _damage;
         hitDirection = _direction; //피격 방향 저장
         hitTime = 0.2f; //피격 시간

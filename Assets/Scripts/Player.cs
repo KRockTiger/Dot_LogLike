@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     [Serializable] //플레이어 스킬 등록
     public class PlayerSkill
     {
+        public GameObject skillObject;
         public string skillName; //스킬 이름
         public KeyCode skillKey; //스킬 키 (※여기서 인스펙터로 설정할 때 마우스 왼쪽은 Mouse4, 오른쪽은 Mouse5로 설정
                                  //        ==> 유니티 인스펙터 오류로 인한 조정)
@@ -37,6 +38,10 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float maxHP = 10f;
     [SerializeField] private float curHP;
+
+    [Header("플레이어 상태")]
+    [SerializeField] private bool isPassDamage = false;
+    [SerializeField] private bool passMode = false;
 
     private void Awake()
     {
@@ -210,6 +215,19 @@ public class Player : MonoBehaviour
     /// </summary>
     public void PHit(float _damage)
     {
+        if (isPassDamage || passMode)
+        {
+            Debug.Log($"현재 보호를 받는 상태입니다.");
+            return;
+        }
         curHP -= _damage;
+        Debug.Log($"{_damage}만큼 피해를 입었습니다.");
+        isPassDamage = true;
+        Invoke("PassEnd", 1f);
+    }
+
+    private void PassEnd()
+    {
+        isPassDamage = false;
     }
 }

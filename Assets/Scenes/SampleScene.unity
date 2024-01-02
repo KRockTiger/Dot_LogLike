@@ -321,7 +321,7 @@ MonoBehaviour:
   - skillObject: {fileID: 3541389025446690452, guid: 41490182c9315f4479af27600ef96774, type: 3}
     skillName: "Q\uC2A4\uD0AC"
     skillKey: 113
-    coolTime: 4
+    coolTime: 0
     coolDown: 0
     skillActive: 1
   - skillObject: {fileID: 0}
@@ -330,7 +330,7 @@ MonoBehaviour:
     coolTime: 4
     coolDown: 0
     skillActive: 1
-  - skillObject: {fileID: 6880222555565516658, guid: 211b43358524ff442be59f3a4df05182, type: 3}
+  - skillObject: {fileID: 6880222555565516658, guid: 7320dbd0cbe35c645accaff1f5eef955, type: 3}
     skillName: "\uB9C8\uC6B0\uC2A4 \uC67C\uCABD"
     skillKey: 323
     coolTime: 0
@@ -347,7 +347,6 @@ MonoBehaviour:
   - {fileID: 293078373}
   - {fileID: 1480122347}
   - {fileID: 138889348}
-  fire01: {fileID: 6880222555565516658, guid: 211b43358524ff442be59f3a4df05182, type: 3}
   curSor: {fileID: 892003478}
   objDynamic: {fileID: 496849395}
   moveSpeed: 10
@@ -1158,11 +1157,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3541389025446690451, guid: 41490182c9315f4479af27600ef96774, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.63
+      value: -0.03
       objectReference: {fileID: 0}
     - target: {fileID: 3541389025446690451, guid: 41490182c9315f4479af27600ef96774, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.04
+      value: 5.02
       objectReference: {fileID: 0}
     - target: {fileID: 3541389025446690451, guid: 41490182c9315f4479af27600ef96774, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1199,6 +1198,14 @@ PrefabInstance:
     - target: {fileID: 3541389025446690452, guid: 41490182c9315f4479af27600ef96774, type: 3}
       propertyPath: m_Name
       value: Fire02
+      objectReference: {fileID: 0}
+    - target: {fileID: 3541389025446690452, guid: 41490182c9315f4479af27600ef96774, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8307199374493617937, guid: 41490182c9315f4479af27600ef96774, type: 3}
+      propertyPath: moveSpeed
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

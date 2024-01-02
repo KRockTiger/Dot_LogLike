@@ -102,7 +102,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 15
   damage: 2
-  oneTarget: 1
+  skill: 2
 --- !u!95 &6880222555565516659
 Animator:
   serializedVersion: 5

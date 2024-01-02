@@ -30,7 +30,6 @@ public class Player : MonoBehaviour
     [Header("플레이어 스킬 셋팅")]
     [SerializeField] private List<PlayerSkill> playerSkills;
     [SerializeField] private List<TMP_Text> coolTimes;
-    [SerializeField] private GameObject fire01;
     [SerializeField] private Transform curSor;
     [SerializeField] private Transform objDynamic;
 
@@ -153,7 +152,7 @@ public class Player : MonoBehaviour
         switch (_skillKey)
         {
             case KeyCode.Q:
-                Debug.Log("Q스킬 발동");                
+                Instantiate(playerSkills[0].skillObject, transform.position, Quaternion.identity, objDynamic); //메테오 소환
                 break;
 
             case KeyCode.E:
@@ -162,8 +161,8 @@ public class Player : MonoBehaviour
                 break;
 
             case KeyCode.Mouse0:
-                GameObject obj = Instantiate(fire01, transform.position, rotTarget, objDynamic);
-                Skill sc = obj.GetComponent<Skill>();
+                GameObject obj = Instantiate(playerSkills[2].skillObject, transform.position, rotTarget, objDynamic);
+                SkillManager sc = obj.GetComponent<SkillManager>();
                 sc.PSetDirection(direction);
                 break;
 

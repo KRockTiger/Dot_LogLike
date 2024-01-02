@@ -14,6 +14,11 @@ public class Player : MonoBehaviour
     private Vector3 posTarget; //타겟(마우스 커서)의 포지션
     [SerializeField] private Vector3 direction; //스킬샷 방향
     private Quaternion rotTarget;
+    private bool isRight;
+    private bool isDash;
+    private SpriteRenderer spRenderer;
+    private Color defColor;
+    private Color dashColor;
 
     [Serializable] //플레이어 스킬 등록
     public class PlayerSkill
@@ -35,6 +40,7 @@ public class Player : MonoBehaviour
 
     [Header("플레이어 스탯")]
     [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private float dashSpeed = 10f;
     [SerializeField] private float maxHP = 10f;
     [SerializeField] private float curHP;
 
@@ -46,6 +52,14 @@ public class Player : MonoBehaviour
     {
         mainCam = Camera.main;
         curHP = maxHP;
+        spRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    private void Start()
+    {
+        defColor = spRenderer.color;
+        dashColor = Color.red;
+        dashColor.a = spRenderer.color.a / 2;
     }
 
     private void Update()
@@ -65,7 +79,19 @@ public class Player : MonoBehaviour
     {
         moveX = Input.GetAxisRaw("Horizontal"); //수평
         moveY = Input.GetAxisRaw("Vertical"); //수직
-        transform.position += new Vector3(moveX, moveY, 0f) * Time.deltaTime * moveSpeed;
+        Vector3 moveDir = new Vector3(moveX, moveY, 0f);
+        if (!isDash) //대쉬가 아닌 상태
+        {
+            transform.position += moveDir * Time.deltaTime * moveSpeed;
+        }
+
+        else //대쉬사용하면
+        {
+            Vector3 dashDir = moveDir;
+            transform.position += dashDir.normalized * Time.deltaTime * dashSpeed;
+            spRenderer.color = dashColor;
+            Invoke("DashEnd", 1f);
+        }
     }
 
     /// <summary>
@@ -105,6 +131,9 @@ public class Player : MonoBehaviour
             scale = new Vector3(-1, 1, 1);
             transform.localScale = scale;
         }
+
+        //캐릭터가 바라보는 방향 저장
+        isRight = (transform.localScale.x <= 0f) ? true : false;
     }
 
     /// <summary>
@@ -152,7 +181,23 @@ public class Player : MonoBehaviour
         switch (_skillKey)
         {
             case KeyCode.Q:
-                Instantiate(playerSkills[0].skillObject, transform.position, Quaternion.identity, objDynamic); //메테오 소환
+                GameObject objMeteor = playerSkills[0].skillObject; //오브젝트 저장
+                Vector3 localMeteor = objMeteor.transform.localScale; //메테오의 방향값 저장
+                if (isRight && localMeteor.x < 0)
+                {
+                    localMeteor.x *= -1;
+                    objMeteor.transform.localScale = localMeteor;
+                }
+
+                else if (!isRight && localMeteor.x > 0)
+                {
+                    localMeteor.x *= -1;
+                    objMeteor.transform.localScale = localMeteor;
+                }
+                Vector3 tarMeteor = posTarget;
+                tarMeteor.x += (isRight) ? -10f : 10f;
+                tarMeteor.y += 15f; //아래로 떨어지다가 적중을 해야 하므로 위로 설정
+                Instantiate(objMeteor, tarMeteor, Quaternion.identity, objDynamic); //메테오 소환
                 break;
 
             case KeyCode.E:
@@ -168,6 +213,7 @@ public class Player : MonoBehaviour
 
             case KeyCode.Mouse1:
                 Debug.Log("마우스 오른쪽 스킬 발동");
+                isDash = true;
                 break;
         }
     }
@@ -223,6 +269,15 @@ public class Player : MonoBehaviour
         Debug.Log($"{_damage}만큼 피해를 입었습니다.");
         isPassDamage = true;
         Invoke("PassEnd", 1f);
+    }
+
+    /// <summary>
+    /// 대쉬 끝낼 타이밍(Invoke용 함수)
+    /// </summary>
+    private void DashEnd()
+    {
+        spRenderer.color = defColor;
+        isDash = false;
     }
 
     private void PassEnd()

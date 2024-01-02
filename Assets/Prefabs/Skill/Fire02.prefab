@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3541389025446690451}
   - component: {fileID: 3541389025446690450}
+  - component: {fileID: 8362870358362763323}
   - component: {fileID: 3541389025446690453}
-  - component: {fileID: 8307199374493617937}
   - component: {fileID: -1087811902423518868}
   - component: {fileID: 2262013824233565470}
   m_Layer: 0
@@ -88,6 +88,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &8362870358362763323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3541389025446690452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37fc7927e22aa6d42a28d1546e8bffdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 20
+  downSpeed: 25
+  damage: 10
+  skill: 0
 --- !u!95 &3541389025446690453
 Animator:
   serializedVersion: 5
@@ -109,21 +125,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8307199374493617937
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3541389025446690452}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dbbde9f5727d03848a3e3ee3ecb1671e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 3
-  damage: 2
-  skill: 0
 --- !u!58 &-1087811902423518868
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -156,9 +157,9 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.05, y: -0.05}
   serializedVersion: 2
-  m_Radius: 0.1
+  m_Radius: 0.13
 --- !u!50 &2262013824233565470
 Rigidbody2D:
   serializedVersion: 4
@@ -185,4 +186,4 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 7

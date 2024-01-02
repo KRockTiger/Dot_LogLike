@@ -15,6 +15,7 @@ public class SkillManager : MonoBehaviour
 {
     [Header("스킬 옵션")]
     [SerializeField] private float moveSpeed = 3f;
+    [SerializeField] private float downSpeed; //메테오 떨어지는 속도
     [SerializeField] private float damage = 2f;
     //[SerializeField, Tooltip("단일기일 경우 true")] private bool oneTarget = false;
     [SerializeField] private Skill skill;
@@ -32,11 +33,18 @@ public class SkillManager : MonoBehaviour
             Enemy enemy = collision.GetComponent<Enemy>();
             if (enemy.PIsSpawnTime() || isHit) //몬스터가 스폰 중일 경우
             {
-                return;
+                if (skill == Skill.fireBall) //단일기일 경우 막기
+                {
+                    return;
+                }
             }
             isHit = true;
             enemy.PHit(direction, damage);
-            Destroy(gameObject);
+
+            if (skill == Skill.fireBall)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 
@@ -71,7 +79,7 @@ public class SkillManager : MonoBehaviour
 
             case Skill.metemor:
                 transform.position += ((transform.localScale.x > 0) ? Vector3.right : Vector3.left).normalized * moveSpeed * Time.deltaTime;
-                transform.position += Vector3.down.normalized * moveSpeed * Time.deltaTime;
+                transform.position += Vector3.down.normalized * downSpeed * Time.deltaTime;
                 break;
         }
     }

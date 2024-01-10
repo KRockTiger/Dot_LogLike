@@ -8,15 +8,18 @@ public class BossEnemy : MonoBehaviour
     public enum PatternName
     {
         PokePattern,
+        MeteorPattern,
     }
 
     [System.Serializable]
     public class BossPattern
     {
+        public GameObject objPattern;
         public PatternName patternName; //패턴 이름
         public int patternNum; //패턴 횟수
         public float delayTime; //패턴에 딜레이를 넣고 싶을 때 사용
         public bool startPattern = false; //패턴 시작 여부
+        public bool usedPattern = false; //패턴 사용 여부
     }
 
     [Header("보스 패턴")]
@@ -37,6 +40,7 @@ public class BossEnemy : MonoBehaviour
     private void Update()
     {
         PatternManager(PatternName.PokePattern, bossPatterns[0].startPattern);
+        //PatternManager(PatternName.MeteorPattern, bossPatterns[1].startPattern);
     }
 
     /// <summary>
@@ -54,6 +58,17 @@ public class BossEnemy : MonoBehaviour
     }
 
     /// <summary>
+    /// 패턴을 변화 시키기 위한 함수
+    /// - 하나의 패턴이 끝나면 다음 패턴을 등록해야하며 다음 패턴 사용하기의 딜레이가 필요
+    /// </summary>
+    private void ChangePattern()
+    {
+        int RandPattern = Random.Range(0, bossPatterns.Count);
+        
+
+    }
+
+    /// <summary>
     /// 플레이어의 위치를 찾고 찌르는 공격
     /// </summary>
     private void PokePlayer()
@@ -68,11 +83,7 @@ public class BossEnemy : MonoBehaviour
         {
             if (repeatPattern != bossPatterns[0].patternNum && bossPatterns[0].startPattern) //연속으로 쓴 횟수와 설정한 연속 횟수가 맞지 않고 패턴 사용중일 경우
             {
-                delayTime -= Time.deltaTime; //다시 쓰기 까지의 딜레이 시간
-                if (Input.GetKeyDown(KeyCode.O))
-                {
-                    Debug.Log(delayTime);
-                }
+                delayTime -= Time.deltaTime; //다시 쓰기 까지의 딜레이 시간               
 
                 if (delayTime <= 0f) //딜레이 시간이 끝나면 다시 패턴 반복
                 {
@@ -85,10 +96,20 @@ public class BossEnemy : MonoBehaviour
             {
                 repeatPattern = 0; //패턴 횟수 초기화
                 bossPatterns[0].startPattern = false; //패턴 발생 끄기
+                bossPatterns[0].usedPattern = true; //패턴 사용 여부 등록
             }
             return;
         }
         transform.position += dirTarget.normalized * pokeSpeed * Time.deltaTime; //입력한 공격방향으로 찌르기
+    }
+
+    /// <summary>
+    /// 플레이어의 위치를 추적하여 메테오를 생성하는 함수
+    /// </summary>
+    private void MeteorInstantiate()
+    {
+        Transform trsPlayer = GameObject.Find("Player").transform;
+        Instantiate(bossPatterns[1].objPattern, new Vector3(trsPlayer.position.x, trsPlayer.position.y + 10f, 0f), Quaternion.identity);
     }
 
     /// <summary>
@@ -114,6 +135,40 @@ public class BossEnemy : MonoBehaviour
                 }
                 PokePlayer();
                 break;
+
+            case PatternName.MeteorPattern:
+                if (Input.GetKeyDown(KeyCode.R))
+                {
+                    bossPatterns[1].startPattern = true;
+                    rePattern = true;
+                    delayTime = bossPatterns[1].delayTime;
+                }
+
+                //if (rePattern && _startPattern)
+                //{
+                //}
+
+                if (repeatPattern != bossPatterns[1].patternNum && bossPatterns[1].startPattern) //연속으로 쓴 횟수와 설정한 연속 횟수가 맞지 않고 패턴 사용중일 경우
+                {
+                    delayTime -= Time.deltaTime; //다시 쓰기 까지의 딜레이 시간
+
+                    if (delayTime <= 0f) //딜레이 시간이 끝나면 다시 패턴 반복
+                    {
+                        rePattern = true;
+                        MeteorInstantiate();
+                        delayTime = bossPatterns[1].delayTime;
+                        repeatPattern += 1;
+                    }
+
+                }
+                else if (repeatPattern == bossPatterns[1].patternNum) //패턴을 다 사용했을 경우
+                {
+                    repeatPattern = 0; //패턴 횟수 초기화
+                    bossPatterns[1].startPattern = false; //패턴 발생 끄기
+                    bossPatterns[1].usedPattern = true;
+                }
+                break;
         }
     }
+
 }

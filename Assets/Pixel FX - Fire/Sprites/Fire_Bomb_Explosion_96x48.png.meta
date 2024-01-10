@@ -204,12 +204,12 @@ TextureImporter:
       name: Fire_Bomb_Explosion_96x48_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 144
-        width: 96
-        height: 48
+        x: 3
+        y: 164
+        width: 93
+        height: 28
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -226,11 +226,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 96
-        y: 144
+        y: 164
         width: 96
-        height: 48
+        height: 28
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -247,11 +247,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 144
+        y: 164
         width: 96
-        height: 48
+        height: 28
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -267,12 +267,12 @@ TextureImporter:
       name: Fire_Bomb_Explosion_96x48_3
       rect:
         serializedVersion: 2
-        x: 288
-        y: 144
-        width: 96
-        height: 48
+        x: 290
+        y: 164
+        width: 94
+        height: 26
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -288,12 +288,12 @@ TextureImporter:
       name: Fire_Bomb_Explosion_96x48_4
       rect:
         serializedVersion: 2
-        x: 0
-        y: 96
-        width: 96
-        height: 48
+        x: 2
+        y: 115
+        width: 94
+        height: 29
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -309,12 +309,12 @@ TextureImporter:
       name: Fire_Bomb_Explosion_96x48_5
       rect:
         serializedVersion: 2
-        x: 96
-        y: 96
-        width: 96
-        height: 48
+        x: 99
+        y: 115
+        width: 92
+        height: 29
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -331,11 +331,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 96
+        y: 112
         width: 96
-        height: 48
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -351,12 +351,12 @@ TextureImporter:
       name: Fire_Bomb_Explosion_96x48_7
       rect:
         serializedVersion: 2
-        x: 288
-        y: 96
-        width: 96
-        height: 48
+        x: 291
+        y: 110
+        width: 93
+        height: 34
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -377,7 +377,7 @@ TextureImporter:
         width: 96
         height: 48
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -398,7 +398,7 @@ TextureImporter:
         width: 96
         height: 48
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -419,7 +419,7 @@ TextureImporter:
         width: 96
         height: 48
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -440,7 +440,7 @@ TextureImporter:
         width: 96
         height: 48
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -461,7 +461,7 @@ TextureImporter:
         width: 96
         height: 48
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []

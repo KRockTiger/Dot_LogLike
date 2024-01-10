@@ -6,9 +6,8 @@ using UnityEngine;
 public enum Skill
 {
     metemor,
-    skillE,
+    fireLaser,
     fireBall,
-    skillM1,
 }
 
 public class SkillManager : MonoBehaviour
@@ -20,10 +19,11 @@ public class SkillManager : MonoBehaviour
     //[SerializeField, Tooltip("단일기일 경우 true")] private bool oneTarget = false;
     [SerializeField] private Skill skill;
 
-    private bool isStop = false;
     private Vector3 direction;
+    private Transform playerPosition;
     private BoxCollider2D boxCollider;
     private CircleCollider2D circleCollider;
+    private bool isStop = false;
     private bool isHit = false; //단일기일 경우 스킬 하나에 한마리만 맞게 해주는 bool형
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -50,7 +50,9 @@ public class SkillManager : MonoBehaviour
 
     private void Awake()
     {
-        if (skill == Skill.fireBall)
+        playerPosition = GameObject.Find("Player").transform; //플레이어의 위치를 저장
+
+        if (skill == Skill.fireBall || skill == Skill.fireLaser)
         {
             boxCollider = GetComponent<BoxCollider2D>();
         }
@@ -81,6 +83,10 @@ public class SkillManager : MonoBehaviour
                 transform.position += ((transform.localScale.x > 0) ? Vector3.right : Vector3.left).normalized * moveSpeed * Time.deltaTime;
                 transform.position += Vector3.down.normalized * downSpeed * Time.deltaTime;
                 break;
+
+            case Skill.fireLaser:
+                transform.position = playerPosition.position;
+                break;
         }
     }
 
@@ -109,6 +115,9 @@ public class SkillManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 스킬이 끝나면 파괴하는 이벤트 버튼
+    /// </summary>
     public void BDestroying()
     {
         Destroy(gameObject);

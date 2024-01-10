@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using TMPro;
+using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Vector3 direction; //스킬샷 방향
     private Quaternion rotTarget;
     private bool isRight;
-    private bool isDash;
+    [SerializeField] private bool isDash;
     private SpriteRenderer spRenderer;
     private Color defColor;
     private Color dashColor;
@@ -29,6 +30,8 @@ public class Player : MonoBehaviour
                                  //        ==> 유니티 인스펙터 오류로 인한 조정)
         public float coolTime = 1f; //정해진 스킬 쿨타임
         public float coolDown = 0f; //현재 쿨타임
+        public float skillDuration; //설정할 스킬 지속 시간
+        public float curDuration; //현재 지속 시간
         public bool skillActive = true; //스킬 활성화 확인
     }
     
@@ -58,8 +61,8 @@ public class Player : MonoBehaviour
     private void Start()
     {
         defColor = spRenderer.color;
-        dashColor = Color.red;
-        dashColor.a = spRenderer.color.a / 2;
+        dashColor = defColor;
+        dashColor.a = 0.5f;
     }
 
     private void Update()
@@ -72,27 +75,6 @@ public class Player : MonoBehaviour
         CoolDown();
     }
 
-    /// <summary>
-    /// 플레이어 움직임
-    /// </summary>
-    private void Moving()
-    {
-        moveX = Input.GetAxisRaw("Horizontal"); //수평
-        moveY = Input.GetAxisRaw("Vertical"); //수직
-        Vector3 moveDir = new Vector3(moveX, moveY, 0f);
-        if (!isDash) //대쉬가 아닌 상태
-        {
-            transform.position += moveDir * Time.deltaTime * moveSpeed;
-        }
-
-        else //대쉬사용하면
-        {
-            Vector3 dashDir = moveDir;
-            transform.position += dashDir.normalized * Time.deltaTime * dashSpeed;
-            spRenderer.color = dashColor;
-            Invoke("DashEnd", 1f);
-        }
-    }
 
     /// <summary>
     /// 마우스 확인
@@ -108,9 +90,28 @@ public class Player : MonoBehaviour
         //위 z값에서 카메라의 z 포지션 값을 미리 빼서 마우스 월드 좌표값의 z값을 0으로 맞춤
         posTarget = mouseWorldPos; //타겟좌표 저장
         curSor.position = posTarget; //커서 오브젝트의 포지션을 타겟 좌표로 저장
+        
+        if (isDash)
+        { return; }
         direction = posTarget - transform.position; //스킬샷 방향 설정
         
         rotTarget = Quaternion.FromToRotation(Vector3.right, direction);
+    }
+
+    /// <summary>
+    /// 플레이어 움직임
+    /// </summary>
+    private void Moving()
+    {
+        if (isDash) //대쉬가 켜질경우 if문 안에 있는 Dash함수 사용하며 아래 코드에 접근 못하게 막기
+        {
+            Dash();
+            return;
+        }
+        moveX = Input.GetAxisRaw("Horizontal"); //수평
+        moveY = Input.GetAxisRaw("Vertical"); //수직
+        Vector3 moveDir = new Vector3(moveX, moveY, 0f);
+        transform.position += moveDir * Time.deltaTime * moveSpeed;
     }
 
     /// <summary>
@@ -157,6 +158,7 @@ public class Player : MonoBehaviour
             {
                 if (Input.GetKeyDown(playerSkills[iNum01].skillKey))
                 {
+                    playerSkills[iNum01].curDuration = playerSkills[iNum01].skillDuration; //지속 시간 설정
                     PlayerSkills(playerSkills[iNum01].skillKey);
                     playerSkills[iNum01].skillActive = false;
                 }
@@ -183,13 +185,13 @@ public class Player : MonoBehaviour
             case KeyCode.Q:
                 GameObject objMeteor = playerSkills[0].skillObject; //오브젝트 저장
                 Vector3 localMeteor = objMeteor.transform.localScale; //메테오의 방향값 저장
-                if (isRight && localMeteor.x < 0)
+                if (isRight && localMeteor.x < 0) //캐릭터가 오른쪽을 향하고 x로컬 스케일이 왼쪽을 향하면
                 {
                     localMeteor.x *= -1;
                     objMeteor.transform.localScale = localMeteor;
                 }
 
-                else if (!isRight && localMeteor.x > 0)
+                else if (!isRight && localMeteor.x > 0) //위 조건과 반대일 경우
                 {
                     localMeteor.x *= -1;
                     objMeteor.transform.localScale = localMeteor;
@@ -201,8 +203,20 @@ public class Player : MonoBehaviour
                 break;
 
             case KeyCode.E:
-                //플레이어 기준 마우스 방향으로 일정 거리 대쉬
-                //대쉬를 사용하는 동안 다른 키를 조작 불가
+                GameObject objLaser = playerSkills[1].skillObject;
+                Vector3 localLaser = objLaser.transform.localScale;
+                if (isRight && localLaser.x < 0)
+                {
+                    localLaser.x *= -1;
+                    objLaser.transform.localScale = localLaser;
+                }
+
+                else if (!isRight && localLaser.x > 0)
+                {
+                    localLaser.x *= -1;
+                    objLaser.transform.localScale = localLaser;
+                }
+                Instantiate(objLaser, transform.position, Quaternion.identity, objDynamic);
                 break;
 
             case KeyCode.Mouse0:
@@ -212,8 +226,7 @@ public class Player : MonoBehaviour
                 break;
 
             case KeyCode.Mouse1:
-                Debug.Log("마우스 오른쪽 스킬 발동");
-                isDash = true;
+                isDash = true;                
                 break;
         }
     }
@@ -256,6 +269,21 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
+    /// 대쉬 함수
+    /// </summary>
+    private void Dash()
+    {
+        transform.position += direction.normalized * Time.deltaTime * dashSpeed; //일정 방향으로 빠르게 지나가기
+
+        playerSkills[3].curDuration -= Time.deltaTime; //지속시간 확인
+
+        if (playerSkills[3].curDuration <= 0f) //지속시간이 끝나면 대쉬 끄기
+        {
+            isDash = false;
+        }
+    }
+
+    /// <summary>
     /// 플레이어 피격하는 기능
     /// </summary>
     public void PHit(float _damage)
@@ -269,15 +297,6 @@ public class Player : MonoBehaviour
         Debug.Log($"{_damage}만큼 피해를 입었습니다.");
         isPassDamage = true;
         Invoke("PassEnd", 1f);
-    }
-
-    /// <summary>
-    /// 대쉬 끝낼 타이밍(Invoke용 함수)
-    /// </summary>
-    private void DashEnd()
-    {
-        spRenderer.color = defColor;
-        isDash = false;
     }
 
     private void PassEnd()

@@ -14,6 +14,7 @@ public enum PlayerSkill
 public enum BossSkill
 {
     meteor,
+    lavaBoom,
     none,
 }
 

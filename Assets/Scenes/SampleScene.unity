@@ -12513,37 +12513,47 @@ MonoBehaviour:
   bossPatterns:
   - objPattern: {fileID: 0}
     patternName: 0
-    patternNum: 3
-    delayTime: 1
+    setRepeatNum: 3
+    curRepeatNum: 0
+    setDelayTime: 1
+    curDelayTime: 0
     startPattern: 0
+    rePattern: 0
     usedPattern: 0
   - objPattern: {fileID: 6463079231239714820, guid: bcfa4bc2a3bafde44bc942b6d68cf240, type: 3}
     patternName: 1
-    patternNum: 3
-    delayTime: 1
+    setRepeatNum: 3
+    curRepeatNum: 0
+    setDelayTime: 1
+    curDelayTime: 0
     startPattern: 0
+    rePattern: 0
     usedPattern: 0
   - objPattern: {fileID: 2342258238109649859, guid: 00e841c773e7aea4fab3687ced5a4d1e, type: 3}
     patternName: 2
-    patternNum: 3
-    delayTime: 0.2
+    setRepeatNum: 3
+    curRepeatNum: 0
+    setDelayTime: 0.5
+    curDelayTime: 0
     startPattern: 0
+    rePattern: 0
     usedPattern: 0
   - objPattern: {fileID: 1927974737325780717, guid: 16faf18b067e9c3498cb70c0f0563feb, type: 3}
     patternName: 3
-    patternNum: 3
-    delayTime: 0.2
+    setRepeatNum: 3
+    curRepeatNum: 0
+    setDelayTime: 0
+    curDelayTime: 0
     startPattern: 0
+    rePattern: 0
     usedPattern: 0
   lavaRange: 0
   fireLineSpawnPoints:
   - {fileID: 885013507}
   - {fileID: 1299880844}
   pokeSpeed: 65
-  delayTime: 0
-  repeatPattern: 0
-  rePattern: 0
   posSearch: 0
+  testStart: 1
 --- !u!1 &7483118417489462117
 GameObject:
   m_ObjectHideFlags: 0

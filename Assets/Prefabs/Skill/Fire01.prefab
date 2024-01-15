@@ -125,7 +125,7 @@ MonoBehaviour:
   downSpeed: 0
   damage: 2
   playerSkill: 2
-  bossSkill: 1
+  bossSkill: 3
 --- !u!50 &-6755080296746793061
 Rigidbody2D:
   serializedVersion: 4

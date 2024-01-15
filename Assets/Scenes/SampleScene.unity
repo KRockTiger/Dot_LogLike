@@ -1519,7 +1519,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -12}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12120,7 +12120,7 @@ GameObject:
   - component: {fileID: 35383027180603757}
   m_Layer: 0
   m_Name: BossEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12144,6 +12144,7 @@ MonoBehaviour:
   damage: 2
   hitTime: 0
   haveCoin: 10
+  isBoss: 0
   skillTest: 1
 --- !u!114 &2373454611029870867
 MonoBehaviour:
@@ -12164,6 +12165,7 @@ MonoBehaviour:
   damage: 2
   hitTime: 0
   haveCoin: 10
+  isBoss: 0
   skillTest: 1
 --- !u!212 &3052365959910398951
 SpriteRenderer:
@@ -12415,6 +12417,7 @@ MonoBehaviour:
   damage: 2
   hitTime: 0
   haveCoin: 10
+  isBoss: 0
   skillTest: 1
 --- !u!212 &5344329039862970589
 SpriteRenderer:
@@ -12510,13 +12513,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f66e9a5f7ecfa4044817717355f219a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isSpawnTime: 1
+  isSpawnTime: 0
   moveSpeed: 0
   maxHP: 500
   curHP: 0
   damage: 5
   hitTime: 0
   haveCoin: 500
+  isBoss: 1
   skillTest: 0
   bossPatterns:
   - objPattern: {fileID: 0}
@@ -12559,6 +12563,7 @@ MonoBehaviour:
   fireLineSpawnPoints:
   - {fileID: 885013507}
   - {fileID: 1299880844}
+  bossPhase: 1
   pokeSpeed: 65
   setDelayTime: 2
   curDelayTime: 0

@@ -19,12 +19,13 @@ public class Enemy : MonoBehaviour
     private Color spawnColor; //스폰타임일 때 컬러
 
     [Header("적 몬스터 스탯")]
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float maxHP = 10f;
-    [SerializeField] private float curHP;
-    [SerializeField] private float damage = 2f;
+    [SerializeField] private float moveSpeed = 5f; //이동속도
+    [SerializeField] private float maxHP = 10f; //적용시킬 몬스터 체력
+    [SerializeField] private float curHP; //현재 체력
+    [SerializeField] private float damage = 2f; //몬스터의 공격력
     [SerializeField] private float hitTime = 0f; //넉백 시간
-    [SerializeField] private int haveCoin = 10;
+    [SerializeField] private int haveCoin = 10; //현재 몬스터가 가지고 있는 코인 갯수
+    [SerializeField] private bool isBoss = false; //보스 여부
 
     [Header("테스트용")]
     [SerializeField] private bool skillTest = false;
@@ -35,7 +36,7 @@ public class Enemy : MonoBehaviour
         {
             Player sc = collision.GetComponent<Player>();
             sc.PHit(damage);
-        }
+        } //=> 플레이어 태그를 감지하고 스크립트에 접근하여 데미지 주기
     }
     private void Awake()
     {
@@ -43,6 +44,12 @@ public class Enemy : MonoBehaviour
         enemyScale = transform.localScale;
         curHP = maxHP;
 
+        if (isBoss)
+        {
+            return;
+        }
+
+        //스폰될 때 랜덤으로 바라볼 방향을 결정
         int randDirenction = Random.Range(0, 2);
         if (randDirenction == 0)
         {
@@ -61,7 +68,7 @@ public class Enemy : MonoBehaviour
         trsPlayer = GameObject.Find("Player").transform;
         defColor = spriteRenderer.color;
 
-        if (!isSpawnTime)
+        if (!isSpawnTime || isBoss)
         {
             return;
         }
@@ -71,7 +78,7 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        if (skillTest)
+        if (skillTest || isBoss)
         { return; }
 
         if (isSpawnTime)
@@ -116,7 +123,7 @@ public class Enemy : MonoBehaviour
 
         else //피격 중인 경우
         {
-            spriteRenderer.color = hitColor;
+            spriteRenderer.color = hitColor; //현재 스프라이트를 피격 컬러로 설정
             transform.position += hitDirection.normalized * moveSpeed * 1.2f * Time.deltaTime; //넉백
 
             if (hitDirection.x < 0) //피격 방향이 왼쪽이면 오른쪽 방향으로 바라보기
@@ -132,7 +139,7 @@ public class Enemy : MonoBehaviour
             hitTime -= Time.deltaTime; //넉백 시간
             if (hitTime <= 0f)
             {
-                spriteRenderer.color = defColor;
+                spriteRenderer.color = defColor; //스프라이트 복구
                 isHitting = false; //피격 판정 끄기
             }
         }

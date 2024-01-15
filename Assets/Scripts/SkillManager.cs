@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public enum PlayerSkill
+public enum PlayerSkill //플레이어에게만 적용
 {
     meteor,
     fireLaser,
     fireBall,
-    none,
+    none, //플레이어 스킬이 아니면 등록
 }
 
-public enum BossSkill
+public enum BossSkill //보스에게만 적용
 {
-    meteor,
+    fireBomb,
     lavaBoom,
-    none,
+    fireLine,
+    none, //보스 스킬이 아니면 등록
 }
 
 public class SkillManager : MonoBehaviour
@@ -38,7 +39,7 @@ public class SkillManager : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Enemy" && bossSkill == BossSkill.none)
+        if (collision.gameObject.tag == "Enemy" && bossSkill == BossSkill.none) //플레이어의 공격
         {
             Enemy enemy = collision.GetComponent<Enemy>();
             if (enemy.PIsSpawnTime() || isHit) //몬스터가 스폰 중일 경우
@@ -113,7 +114,7 @@ public class SkillManager : MonoBehaviour
 
         switch (_skill)
         {
-            case BossSkill.meteor:
+            case BossSkill.fireBomb:
                 transform.position += Vector3.down * Time.deltaTime * downSpeed;
                 break;
 

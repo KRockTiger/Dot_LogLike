@@ -17,9 +17,9 @@ public class Player : MonoBehaviour
     private Quaternion rotTarget;
     private bool isRight;
     [SerializeField] private bool isDash;
-    private SpriteRenderer spRenderer;
-    private Color defColor;
-    private Color dashColor;
+    private SpriteRenderer spRenderer; //현재 스프라이트
+    private Color defColor; //일반 스프라이트 색
+    private Color passColor; //무적용 스프라이트 색
 
     [Serializable] //플레이어 스킬 등록
     public class PlayerSkill
@@ -48,8 +48,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float curHP;
 
     [Header("플레이어 상태")]
-    [SerializeField] private bool isPassDamage = false;
-    [SerializeField] private bool passMode = false;
+    [SerializeField] private bool isPassDamage = false; //대쉬 중 무적효과를 적용
+    [SerializeField] private bool passMode = false; //한번 피격을 당하면 1초동안 무적효과를 적용
 
     private void Awake()
     {
@@ -61,8 +61,8 @@ public class Player : MonoBehaviour
     private void Start()
     {
         defColor = spRenderer.color;
-        dashColor = defColor;
-        dashColor.a = 0.5f;
+        passColor = defColor;
+        passColor.a = 0.5f;
     }
 
     private void Update()
@@ -91,7 +91,7 @@ public class Player : MonoBehaviour
         posTarget = mouseWorldPos; //타겟좌표 저장
         curSor.position = posTarget; //커서 오브젝트의 포지션을 타겟 좌표로 저장
         
-        if (isDash)
+        if (isDash) //대쉬 상태일 때 리턴
         { return; }
         direction = posTarget - transform.position; //스킬샷 방향 설정
         
@@ -143,7 +143,7 @@ public class Player : MonoBehaviour
     private void PlayerCamera()
     {
         Vector3 posPlayer = transform.position;
-        mainCam.gameObject.transform.position = new Vector3(posPlayer.x, posPlayer.y, posPlayer.z - 10);
+        mainCam.gameObject.transform.position = new Vector3(posPlayer.x, posPlayer.y, posPlayer.z - 12);
     }
 
     /// <summary>
@@ -273,6 +273,8 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Dash()
     {
+        isPassDamage = true;
+        spRenderer.color = passColor;
         transform.position += direction.normalized * Time.deltaTime * dashSpeed; //일정 방향으로 빠르게 지나가기
 
         playerSkills[3].curDuration -= Time.deltaTime; //지속시간 확인
@@ -280,6 +282,8 @@ public class Player : MonoBehaviour
         if (playerSkills[3].curDuration <= 0f) //지속시간이 끝나면 대쉬 끄기
         {
             isDash = false;
+            spRenderer.color = defColor;
+            isPassDamage = false;
         }
     }
 
@@ -295,12 +299,14 @@ public class Player : MonoBehaviour
         }
         curHP -= _damage;
         Debug.Log($"{_damage}만큼 피해를 입었습니다.");
-        isPassDamage = true;
+        passMode = true;
+        spRenderer.color = passColor;
         Invoke("PassEnd", 1f);
     }
 
     private void PassEnd()
     {
-        isPassDamage = false;
+        passMode = false;
+        spRenderer.color = defColor;
     }
 }

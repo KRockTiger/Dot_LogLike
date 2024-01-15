@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UIElements;
 
 public class BossEnemy : Enemy
@@ -31,15 +32,14 @@ public class BossEnemy : Enemy
     [SerializeField] private List<BossPattern> bossPatterns; //패턴 리스트 만들기
     [SerializeField] private float lavaRange; //라바 패턴 범위 설정
     [SerializeField] private Transform[] fireLineSpawnPoints; //불 장판 생성할 필드 넓이를 설정할 Transform
+    [SerializeField] private int bossPhase = 1; //보스 페이즈 확인
     private int randLava = 0; //라바 패턴은 2종류가 있으며 랜덤으로 하나를 적용 시키기 위해 Random.Range를 설정
+    private bool isRand = true; //라바 패턴을 한 번만 결정하기 위해 사용
 
     [Header("보스 스텟")]
     [SerializeField] private float pokeSpeed = 20f; //찌르기 패턴의 이동 속도
 
-    //private int bossPhase = 1;
     private Vector3 posTarget; //플레이어의 위치를 타겟으로 넣을 벡터 변수
-    private Vector3 dirTarget; //현 위치에서 플레이어 위치까지의 방향을 정할 벡터 변수
-    private Vector3 startPoint; //보스가 찌르기 공격할 때 찌르기 시작하는 위치를 저장하는 곳
     private Vector3 minVector; //불 장판 최소점
     private Vector3 maxVector; //불 장판 최대점
     private bool posSearch; //위치를 한 번만 찾기 위한 제어기
@@ -63,15 +63,23 @@ public class BossEnemy : Enemy
             CheckPattern();
         }
 
-        if (!UsingPattern) //패턴 사용 중이 아니고 체인지 도중이 아닐경우
+        if (Input.GetKeyDown(KeyCode.C)) //임의로 페이즈 확인 후 적용
+        {
+            PhaseChange();
+        }
+
+        if (!UsingPattern && !testStart) //패턴 사용 중이 아니고 체인지 도중이 아닐경우
         {
             NextPattern(); //패턴 바꾸기
         }
 
-        PatternManager(PatternName.PokePattern, bossPatterns[0].startPattern);
-        PatternManager(PatternName.MeteorPattern, bossPatterns[1].startPattern);
-        PatternManager(PatternName.LavaPattern, bossPatterns[2].startPattern);
-        PatternManager(PatternName.LinePattern, bossPatterns[3].startPattern);
+        if (UsingPattern) //패턴 사용이 등록 되면
+        {
+            PatternManager(PatternName.PokePattern, bossPatterns[0].startPattern);
+            PatternManager(PatternName.MeteorPattern, bossPatterns[1].startPattern);
+            PatternManager(PatternName.LavaPattern, bossPatterns[2].startPattern);
+            PatternManager(PatternName.LinePattern, bossPatterns[3].startPattern);
+        }
     }
 
     /// <summary>
@@ -93,22 +101,46 @@ public class BossEnemy : Enemy
     /// </summary>
     private void CheckPattern()
     {
-        //if (UsingPattern) //패턴이 사용중이라면 리턴
-        //{
-        //    return;
-        //}
-
-        for (int iNum01 = 0; iNum01 < bossPatterns.Count; iNum01++) //패턴 목록 탐지
+        switch (bossPhase) //보스 페이즈 확인
         {
-            if (!bossPatterns[iNum01].usedPattern) //만약 사용 안한 패턴이 있으면
-            {
-                ChangePattern(); //패턴 변화 시킨후 발동
+            case 1: //1페이즈일 경우 ==> 1페이즈는 보스가 패턴을 4개중 3개만 랜덤으로 사용할 계획
 
-                return;
-            }
+                int phase01Count = 0; //사용 횟수 감지할 변수 생성
+
+                for (int iNum01 = 0; iNum01 < bossPatterns.Count; iNum01++) //패턴 목록 탐지
+                {
+                    if (bossPatterns[iNum01].usedPattern) //패턴이 사용 되었으면
+                    {
+                        phase01Count += 1; //사용횟수 1 추가
+                    }
+                } //==> 각 패턴 사용여부를 확인하여 사용횟수를 누적 시키고 확인
+
+                if (phase01Count != 3) //패턴 횟수가 3이 아닐 경우
+                {
+                    ChangePattern(); //패턴 변화 시킨후 발동
+                }
+
+                else //패턴 횟수가 3일 경우
+                {
+                    ResetPattern(); //그로기 후 초기화를 위해 사용
+                }
+                break;
+
+            case 2: //2페이즈일 경우
+
+                for (int iNum01 = 0; iNum01 < bossPatterns.Count; iNum01++) //패턴 목록 탐지
+                {
+                    if (!bossPatterns[iNum01].usedPattern) //만약 사용 안한 패턴이 있으면
+                    {
+                        ChangePattern(); //패턴 변화 시킨후 발동
+
+                        return;
+                    }
+                }
+
+                ResetPattern(); //모든 패턴이 사용되었으면 그로기 후 초기화를 위해 사용
+                break;
         }
-
-        ResetPattern(); //모든 패턴이 사용되었으면 그로기 후 초기화를 위해 사용
     }
 
     /// <summary>
@@ -127,16 +159,49 @@ public class BossEnemy : Enemy
             }
         }
 
-        Debug.Log(randNum);
+        Debug.Log(randNum); //패턴 사용 횟수 확인용 디버그
         bossPatterns[randNum].startPattern = true; //패턴 발동
         UsingPattern = true; //패턴 사용 등록
     }
 
+    /// <summary>
+    /// 사용한 패턴 다시 초기화
+    /// </summary>
     private void ResetPattern()
     {
         for (int iNum01 = 0; iNum01 < bossPatterns.Count; iNum01++)
         {
             bossPatterns[iNum01].usedPattern = false; //패턴 초기화
+        }
+    }
+
+    /// <summary>
+    /// 보스생성 및 격파 당했을 때만 사용
+    /// </summary>
+    private void PhaseChange()
+    {
+        switch (bossPhase) //보스 페이즈 확인
+        {
+            case 1: //1페이즈
+                for (int iNum01 = 0; iNum01 < bossPatterns.Count; iNum01++)
+                {
+                    bossPatterns[iNum01].setRepeatNum = 3;
+                }
+                break;
+
+            case 2: //2페이즈
+                for (int iNum01 = 0; iNum01 < bossPatterns.Count; iNum01++)
+                {
+                    bossPatterns[iNum01].setRepeatNum = 4;
+                }
+                break;
+
+            case 3: //3페이즈
+                for (int iNum01 = 0; iNum01 < bossPatterns.Count; iNum01++)
+                {
+                    bossPatterns[iNum01].setRepeatNum = 5;
+                }
+                break;
         }
     }
 
@@ -148,9 +213,7 @@ public class BossEnemy : Enemy
     {
         if (!posSearch) //패턴 사용 중 일경우 리턴
         { return; }
-        posTarget = GameObject.Find("Player").transform.position; //플레이어의 위치값 저장
-        startPoint = transform.position; //시작 위치
-        dirTarget = posTarget - startPoint; //방향 벡터
+        posTarget = GameObject.Find("Player").transform.position; //플레이어의 위치값 저장        
         posSearch = false; //한번 사용하면 바로 잠금
     }
 
@@ -187,8 +250,8 @@ public class BossEnemy : Enemy
             }
             return;
         }
-        //transform.position += dirTarget.normalized * pokeSpeed * Time.deltaTime; //입력한 공격방향으로 찌르기
-        transform.position = Vector3.MoveTowards(transform.position, posTarget, Time.deltaTime * pokeSpeed);
+        //transform.position += dirTarget.normalized * pokeSpeed * Time.deltaTime; => 목적지가 없이 이동할 때 쓰는 코드
+        transform.position = Vector3.MoveTowards(transform.position, posTarget, Time.deltaTime * pokeSpeed); //입력한 공격방향으로 찌르기
         //이동에 목적지가 있을 경우 Vector3.MoveTowards(이동시작 좌표, 목표좌표, 이동 시간)를 이용
     }
 
@@ -233,7 +296,6 @@ public class BossEnemy : Enemy
         Instantiate(bossPatterns[2].objPattern, rangeMXMY, Quaternion.identity); //왼쪽 아래
     }
 
-
     /// <summary>
     /// 불 장판 소환 필드 생성
     /// </summary>
@@ -252,7 +314,7 @@ public class BossEnemy : Enemy
     {
         FireLineField(); //필드 생성
 
-        for (int iNum01 = 0; iNum01 < 3; iNum01++)
+        for (int iNum01 = 0; iNum01 < bossPatterns[3].setRepeatNum; iNum01++)
         {
             float xVector = Random.Range(minVector.x, maxVector.x); //x좌표 랜덤 적용
             float yVector = Random.Range(minVector.y, maxVector.y); //y좌표 랜덤 적용
@@ -282,14 +344,20 @@ public class BossEnemy : Enemy
                 if (bossPatterns[0].rePattern && _startPattern) //패턴 시작하거나 재사용할 경우
                 {
                     bossPatterns[0].curRepeatNum += 1; //패턴 횟수 1증가
-                    bossPatterns[0].curDelayTime = bossPatterns[0].setDelayTime;
-                    posSearch = true;
-                    bossPatterns[0].rePattern = false;
+                    bossPatterns[0].curDelayTime = bossPatterns[0].setDelayTime; //딜레이 타임 적용
+                    posSearch = true; //플레이어 위치 찾기
+                    bossPatterns[0].rePattern = false; //재사용 버튼 끄기
                 }
 
                 if (_startPattern)
                 {
-                    PokePlayer();
+                    if (bossPatterns[0].curRepeatNum == 0) //첫 찌르기만 적용
+                    {
+                        bossPatterns[0].curRepeatNum += 1; //패턴 횟수 1증가
+                        bossPatterns[0].curDelayTime = bossPatterns[0].setDelayTime; //딜레이 타임 적용
+                        posSearch = true; //플레이어 위치 찾기
+                    }
+                    PokePlayer(); //찌르기 공격
                 }
                 break;
 
@@ -329,14 +397,18 @@ public class BossEnemy : Enemy
                     randLava = Random.Range(0, 2); //두 가지의 라바 패턴 중 하나를 결정
                 }
 
+                if (isRand)
+                {
+                    randLava = Random.Range(0, 2); //두 가지의 라바 패턴 중 하나를 결정
+                    isRand = false;
+                }
+
                 if (bossPatterns[2].curRepeatNum != bossPatterns[2].setRepeatNum && bossPatterns[2].startPattern) //연속으로 쓴 횟수와 설정한 연속 횟수가 맞지 않고 패턴 사용중일 경우
                 {
                     bossPatterns[2].curDelayTime -= Time.deltaTime; //다시 쓰기 까지의 딜레이 시간
 
                     if (bossPatterns[2].curDelayTime <= 0f) //딜레이 시간이 끝나면 다시 패턴 반복
                     {
-                        randLava = Random.Range(0, 2); //두 가지의 라바 패턴 중 하나를 결정
-
                         if (randLava == 0)
                         {
                             LavaInstantiate01(); //수직형 라바 패턴
@@ -358,6 +430,7 @@ public class BossEnemy : Enemy
                     bossPatterns[2].startPattern = false; //패턴 발생 끄기
                     bossPatterns[2].usedPattern = true;
                     lavaRange = 0f; //사거리 초기화
+                    isRand = true; //랜덤 활성화
                     UsingPattern = false; //패턴이 끝났음을 의미
                 }
                 break;
@@ -368,12 +441,55 @@ public class BossEnemy : Enemy
                     bossPatterns[3].startPattern = true;
                 }
                 if (bossPatterns[3].startPattern == true)
-                { 
+                {
                     SpawnFireLine(); //오브젝트 생성
                     bossPatterns[3].startPattern = false; //start트리거 끄기
                     bossPatterns[3].usedPattern = true; //패턴 사용했음을 확인
                     UsingPattern = false; //패턴이 끝났음을 의미
                 }
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 3페이즈 상태에서 4개 패턴 다 사용한 후 강화 패턴을 사용
+    /// 강화 패턴은 총 3개이고 그 중 하나를 랜덤으로 발동
+    /// </summary>
+    private void UpgradePattern()
+    {
+        int randPattern = Random.Range(0, 3);
+
+        switch (randPattern)
+        {
+            case 0:
+                lavaRange += 5f;
+                Vector3 rangePlusX01 = new Vector3(transform.position.x + lavaRange, transform.position.y, 0f);
+                Vector3 rangeMinusX01 = new Vector3(transform.position.x - lavaRange, transform.position.y, 0f);
+                Vector3 rangePlusY01 = new Vector3(transform.position.x, transform.position.y + lavaRange, 0f);
+                Vector3 rangeMinusY01 = new Vector3(transform.position.x, transform.position.y - lavaRange, 0f);
+                Instantiate(bossPatterns[2].objPattern, rangePlusX01, Quaternion.identity); //오른쪽
+                Instantiate(bossPatterns[2].objPattern, rangeMinusX01, Quaternion.identity); //왼쪽
+                Instantiate(bossPatterns[2].objPattern, rangePlusY01, Quaternion.identity); //위
+                Instantiate(bossPatterns[2].objPattern, rangeMinusY01, Quaternion.identity); //아래
+
+                for (int iNum01 = 0; iNum01 < 8; iNum01++)
+                {
+                    lavaRange += 5f;
+                    Vector3 rangePlusX02 = new Vector3(transform.position.x + lavaRange, transform.position.y, 0f);
+                    Vector3 rangeMinusX02 = new Vector3(transform.position.x - lavaRange, transform.position.y, 0f);
+                    Vector3 rangePlusY02 = new Vector3(transform.position.x, transform.position.y + lavaRange, 0f);
+                    Vector3 rangeMinusY02 = new Vector3(transform.position.x, transform.position.y - lavaRange, 0f);
+                    Instantiate(bossPatterns[2].objPattern, rangePlusX02, Quaternion.identity); //오른쪽
+                    Instantiate(bossPatterns[2].objPattern, rangeMinusX02, Quaternion.identity); //왼쪽
+                    Instantiate(bossPatterns[2].objPattern, rangePlusY02, Quaternion.identity); //위
+                    Instantiate(bossPatterns[2].objPattern, rangeMinusY02, Quaternion.identity); //아래
+                }
+                break;
+
+            case 1:
+                break;
+
+            case 2:
                 break;
         }
     }

@@ -12510,6 +12510,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f66e9a5f7ecfa4044817717355f219a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isSpawnTime: 1
+  moveSpeed: 0
+  maxHP: 500
+  curHP: 0
+  damage: 5
+  hitTime: 0
+  haveCoin: 500
+  skillTest: 0
   bossPatterns:
   - objPattern: {fileID: 0}
     patternName: 0
@@ -12552,8 +12560,9 @@ MonoBehaviour:
   - {fileID: 885013507}
   - {fileID: 1299880844}
   pokeSpeed: 65
-  posSearch: 0
-  testStart: 1
+  setDelayTime: 2
+  curDelayTime: 0
+  testStart: 0
 --- !u!1 &7483118417489462117
 GameObject:
   m_ObjectHideFlags: 0

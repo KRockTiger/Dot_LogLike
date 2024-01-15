@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class BossEnemy : MonoBehaviour
+public class BossEnemy : Enemy
 {
     public enum PatternName //패턴 이름
     {
@@ -42,7 +42,7 @@ public class BossEnemy : MonoBehaviour
     private Vector3 startPoint; //보스가 찌르기 공격할 때 찌르기 시작하는 위치를 저장하는 곳
     private Vector3 minVector; //불 장판 최소점
     private Vector3 maxVector; //불 장판 최대점
-    [SerializeField] private bool posSearch; //위치를 한 번만 찾기 위한 제어기
+    private bool posSearch; //위치를 한 번만 찾기 위한 제어기
     private bool _usingPattern; //패턴 사용 중일 때 true
     private bool UsingPattern
     {
@@ -52,19 +52,20 @@ public class BossEnemy : MonoBehaviour
         }
         get => _usingPattern;
     }
+    [SerializeField] private float setDelayTime; //다음 패턴 발동하기의 딜레이 시간 설정
+    [SerializeField] private float curDelayTime; //다음 패턴 발동하기의 현재 딜레이 시간
     [SerializeField] private bool testStart = false; //테스트시작
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.T)) //테스트 설정
         {
-            testStart = !testStart;
+            CheckPattern();
         }
 
-        if (testStart) //테스트 중이 아닐경우 리턴
+        if (!UsingPattern) //패턴 사용 중이 아니고 체인지 도중이 아닐경우
         {
-            //이제 1~2페이즈는 순서 랜덤으로 패턴은 중복되지 않게 사용
-            ChangePattern(); //패턴 변경
+            NextPattern(); //패턴 바꾸기
         }
 
         PatternManager(PatternName.PokePattern, bossPatterns[0].startPattern);
@@ -74,29 +75,61 @@ public class BossEnemy : MonoBehaviour
     }
 
     /// <summary>
-    /// 패턴을 변화 시키기 위한 함수
-    /// - 하나의 패턴이 끝나면 다음 패턴을 등록해야하며 다음 패턴 사용하기의 딜레이가 필요
+    /// 패턴 넘기는 함수
     /// </summary>
-    private void ChangePattern()
+    private void NextPattern()
     {
-        if (UsingPattern) //패턴이 사용중이라면 리턴
+        curDelayTime -= Time.deltaTime; //패턴 넘기는 딜레이 시간 적용
+
+        if (curDelayTime <= 0f) //딜레이 타임이 끝나면
         {
-            return;
+            curDelayTime = setDelayTime;
+            CheckPattern(); //패턴 교체
         }
+    }
+
+    /// <summary>
+    /// 패턴을 변화 시키기 위한 함수
+    /// </summary>
+    private void CheckPattern()
+    {
+        //if (UsingPattern) //패턴이 사용중이라면 리턴
+        //{
+        //    return;
+        //}
 
         for (int iNum01 = 0; iNum01 < bossPatterns.Count; iNum01++) //패턴 목록 탐지
         {
-            if (!bossPatterns[iNum01].usedPattern) //만약 이미 사용했던 패턴이면
+            if (!bossPatterns[iNum01].usedPattern) //만약 사용 안한 패턴이 있으면
             {
-                bossPatterns[iNum01].startPattern = true; //패턴 사용 시작
-                bossPatterns[iNum01].rePattern = true;
-                UsingPattern = true; //패턴 사용 등록
+                ChangePattern(); //패턴 변화 시킨후 발동
 
                 return;
             }
         }
 
         ResetPattern(); //모든 패턴이 사용되었으면 그로기 후 초기화를 위해 사용
+    }
+
+    /// <summary>
+    /// 패턴을 변화 시키기 위한 함수
+    /// - 하나의 패턴이 끝나면 다음 패턴을 등록해야하며 다음 패턴 사용하기의 딜레이가 필요
+    /// </summary>
+    private void ChangePattern()
+    {
+        int randNum = Random.Range(0, bossPatterns.Count); //임의의 패턴 번호를 설정
+
+        if (bossPatterns[randNum].usedPattern) //만약 랜덤으로 결정한 번호의 패턴이 이미 발동된 거라면 다시 적용
+        {
+            while (bossPatterns[randNum].usedPattern) //발동된 패턴이 또 걸릴 수 있으므로 
+            {
+                randNum = Random.Range(0, bossPatterns.Count); //다시 재설정
+            }
+        }
+
+        Debug.Log(randNum);
+        bossPatterns[randNum].startPattern = true; //패턴 발동
+        UsingPattern = true; //패턴 사용 등록
     }
 
     private void ResetPattern()
@@ -156,6 +189,7 @@ public class BossEnemy : MonoBehaviour
         }
         //transform.position += dirTarget.normalized * pokeSpeed * Time.deltaTime; //입력한 공격방향으로 찌르기
         transform.position = Vector3.MoveTowards(transform.position, posTarget, Time.deltaTime * pokeSpeed);
+        //이동에 목적지가 있을 경우 Vector3.MoveTowards(이동시작 좌표, 목표좌표, 이동 시간)를 이용
     }
 
     /// <summary>
@@ -238,7 +272,7 @@ public class BossEnemy : MonoBehaviour
     {
         switch (_pattern)
         {
-            case PatternName.PokePattern:
+            case PatternName.PokePattern: //찌르기 패턴 -------------------------------------------------------------------------------------------------
                 if (Input.GetKeyDown(KeyCode.Alpha1)) //패턴 발동 트리거
                 {
                     bossPatterns[0].startPattern = true;
@@ -252,10 +286,14 @@ public class BossEnemy : MonoBehaviour
                     posSearch = true;
                     bossPatterns[0].rePattern = false;
                 }
-                PokePlayer();
+
+                if (_startPattern)
+                {
+                    PokePlayer();
+                }
                 break;
 
-            case PatternName.MeteorPattern:
+            case PatternName.MeteorPattern: //메테오 패턴 --------------------------------------------------------------------------------------------------
                 if (Input.GetKeyDown(KeyCode.Alpha2)) //패턴 발동 트리거
                 {
                     bossPatterns[1].startPattern = true;
@@ -284,7 +322,7 @@ public class BossEnemy : MonoBehaviour
                 }
                 break;
 
-            case PatternName.LavaPattern:
+            case PatternName.LavaPattern: //라바 패턴 -----------------------------------------------------------------------------------------------------
                 if (Input.GetKeyDown(KeyCode.Alpha3)) //패턴 발동 트리거
                 {
                     bossPatterns[2].startPattern = true;
@@ -297,6 +335,8 @@ public class BossEnemy : MonoBehaviour
 
                     if (bossPatterns[2].curDelayTime <= 0f) //딜레이 시간이 끝나면 다시 패턴 반복
                     {
+                        randLava = Random.Range(0, 2); //두 가지의 라바 패턴 중 하나를 결정
+
                         if (randLava == 0)
                         {
                             LavaInstantiate01(); //수직형 라바 패턴
@@ -322,16 +362,16 @@ public class BossEnemy : MonoBehaviour
                 }
                 break;
 
-            case PatternName.LinePattern:
+            case PatternName.LinePattern: //불 장판 패턴 --------------------------------------------------------------------------------------------
                 if (Input.GetKeyDown(KeyCode.Alpha4))
                 {
                     bossPatterns[3].startPattern = true;
-                    SpawnFireLine();
                 }
                 if (bossPatterns[3].startPattern == true)
                 { 
-                    bossPatterns[3].startPattern = false;
-                    bossPatterns[3].usedPattern = true;
+                    SpawnFireLine(); //오브젝트 생성
+                    bossPatterns[3].startPattern = false; //start트리거 끄기
+                    bossPatterns[3].usedPattern = true; //패턴 사용했음을 확인
                     UsingPattern = false; //패턴이 끝났음을 의미
                 }
                 break;

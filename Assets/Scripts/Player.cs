@@ -44,7 +44,7 @@ public class Player : MonoBehaviour
     [Header("플레이어 스탯")]
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float dashSpeed = 10f;
-    [SerializeField] private float maxHP = 10f;
+    [SerializeField] private float maxHP = 10f; //==>플레이어의 체력을 게이지가 아닌 칸으로 설정하는건 좋을까???
     [SerializeField] private float curHP;
 
     [Header("플레이어 상태")]

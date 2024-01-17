@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<GameObject> enemies; //등록할 몬스터
     [SerializeField] private float spawnTime; //설정할 스폰 타이머
     [SerializeField] private float spawnTimer; //실시간 타이머
+    [SerializeField] private GameObject bossHPUI; //보스 체력 UI 오브젝트    
+    [SerializeField] private bool isBossBattle = false; //보스전 유무 판정
 
     [Header("소환 관리")]
     [SerializeField] private bool useSpawn = false;
@@ -38,6 +40,7 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         coinText.text = coin.ToString() + "$";
+        BossHPUI();
         if (!useSpawn)
         { return; }
         SpawnCountDown();
@@ -86,6 +89,22 @@ public class GameManager : MonoBehaviour
         maxVector = spawnPoints[1].position;
 
         return (minVector, maxVector);
+    }
+
+    /// <summary>
+    /// 보스 체력 UI를 담당
+    /// </summary>
+    private void BossHPUI()
+    {
+        if (isBossBattle) //보스전일 경우
+        {
+            bossHPUI.SetActive(true); //보스체력 UI 활성화
+        }
+
+        else //보스전이 아닐경우
+        {
+            bossHPUI.SetActive(false); //보스체력 UI 비활성화
+        }
     }
 
     /// <summary>

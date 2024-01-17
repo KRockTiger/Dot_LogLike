@@ -53,7 +53,7 @@ public class BossEnemy : Enemy
         get => _usingPattern;
     }
     [SerializeField] private float setDelayTime; //다음 패턴 발동하기의 딜레이 시간 설정
-    [SerializeField] private float curDelayTime; //다음 패턴 발동하기의 현재 딜레이 시간
+    [SerializeField] private float curDelayTime; //다음 패턴 발동하기의 현재 딜레이 시간    
     [SerializeField] private bool testStart = false; //테스트시작
 
     private void Update()
@@ -449,6 +449,14 @@ public class BossEnemy : Enemy
                 }
                 break;
         }
+    }
+
+    /// <summary>
+    /// 보스 체력 UI를 담당
+    /// </summary>
+    private void BossHPUI()
+    {
+
     }
 
     /// <summary>

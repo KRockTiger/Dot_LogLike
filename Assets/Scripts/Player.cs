@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Events;
 using TMPro;
-using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class Player : MonoBehaviour
     private float moveY; //y축 움직임
     private Camera mainCam; //카메라
     private Vector3 posTarget; //타겟(마우스 커서)의 포지션
-    [SerializeField] private Vector3 direction; //스킬샷 방향
+    private Vector3 direction; //스킬샷 방향
     private Quaternion rotTarget;
     private bool isRight;
     [SerializeField] private bool isDash;
@@ -38,15 +38,18 @@ public class Player : MonoBehaviour
     [Header("플레이어 스킬 셋팅")]
     [SerializeField] private List<PlayerSkill> playerSkills; //플레이어 스킬 리스트
     [SerializeField] private List<TMP_Text> coolTimes; //스킬쿨타임 텍스트
+    [SerializeField] private List<Image> skillImages; //스킬 이미지
     [SerializeField] private Transform curSor; //커서오브젝트
     [SerializeField] private Transform objDynamic; //소환할 오브젝트를 담을 오브젝트
+    private Color coolSkillColor;
 
     [Header("플레이어 스탯")]
     [SerializeField] private float moveSpeed = 10f; //일반 이동속도
     [SerializeField] private float dashSpeed = 10f; //대쉬 이동속도
-    [SerializeField] private int maxHP = 5; //설정 체력
+    [SerializeField] private GameObject[] hearts; //하트 UI를 담을 오브젝트 배열
     [SerializeField] private int curHP; //현재 체력
-    [SerializeField] private Transform[] hearts;
+    [SerializeField] private int maxHP; //최대 체력
+    //private int setMaxHP = 5; //설정 가능한 최대 체력 ==> 최대 체력 증가 아이템을 먹었을 경우 막기 위한 코드
 
     [Header("플레이어 상태")]
     [SerializeField] private bool isPassDamage = false; //대쉬 중 무적효과를 적용
@@ -64,16 +67,21 @@ public class Player : MonoBehaviour
         defColor = spRenderer.color; //현재 스프라이트 저장
         passColor = defColor;
         passColor.a = 0.5f; //데미지 무시 상태일 때의 스프라이트 저장
+        coolSkillColor = Color.white;
+        coolSkillColor.a = 0.5f;
     }
 
     private void Update()
     {
         CheckMouse();
         Moving();
+        CheckPosition();
         Turning();
         PlayerCamera();
         SkillManager();
         CoolDown();
+        CoolTimeUI();
+        HeartCheck();
     }
 
 
@@ -113,6 +121,39 @@ public class Player : MonoBehaviour
         moveY = Input.GetAxisRaw("Vertical"); //수직
         Vector3 moveDir = new Vector3(moveX, moveY, 0f);
         transform.position += moveDir * Time.deltaTime * moveSpeed;
+    }
+
+    /// <summary>
+    /// 필드를 벗어 날려고 할 경우 방지
+    /// </summary>
+    private void CheckPosition()
+    {
+        //현재 위치를 체크
+        Vector3 checkPosition = transform.position;
+
+        //만약 정해진 영역을 넘으려고 하면 그 영역으로 이동시켜 막기
+        if (checkPosition.x <= -21.45f)
+        {
+            checkPosition.x = -21.45f;
+        }
+
+        if (checkPosition.x >= 21.45f)
+        {
+            checkPosition.x = 21.45f;
+        }
+        
+        if (checkPosition.y <= -15.3f)
+        {
+            checkPosition.y = -15.3f;
+        }
+        
+        if (checkPosition.y >= 15.3f)
+        {
+            checkPosition.y = 15.3f;
+        }
+
+        //조정된 위치를 다시 오브젝트에 적용
+        transform.position = checkPosition;
     }
 
     /// <summary>
@@ -289,6 +330,27 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
+    /// 스킬 쿨타임일 때 UI설정
+    /// </summary>
+    private void CoolTimeUI()
+    {
+        for (int iNum01 = 0; iNum01 < coolTimes.Count; iNum01++) //모든 스킬 탐지
+        {
+            if (playerSkills[iNum01].skillActive) //스킬 사용이 가능하면
+            {
+                coolTimes[iNum01].gameObject.SetActive(false); //쿨타임 오브젝트 비활성화
+                skillImages[iNum01].color = Color.white; //스킬 이미지를 불투명으로 설정
+            }
+
+            else //스킬 사용이 불가능하면
+            {
+                coolTimes[iNum01].gameObject.SetActive(true); //쿨타임 오브젝트 활성화
+                skillImages[iNum01].color = coolSkillColor; //스킬 이미지를 반투명으로 설정
+            }
+        }
+    }
+
+    /// <summary>
     /// 플레이어 피격하는 기능
     /// </summary>
     public void PHit(int _damage)
@@ -307,14 +369,36 @@ public class Player : MonoBehaviour
 
     /// <summary>
     /// 체력 변환이 될 때 사용
+    /// UI적용만 쓰는 함수
     /// </summary>
-    private void HeartChange()
+    private void HeartCheck()
     {
-        for (int iNum01 = 0; iNum01 <= hearts.Length;  iNum01++)
+        int heartNum = 0; //하트 개수를 담을 임의의 변수 생성
+        
+        for (int iNum01 = 0; iNum01 < hearts.Length;  iNum01++)
         {
-            if (curHP <= 0)
+            if (hearts[iNum01].activeSelf)
             {
+                heartNum += 1;
+            }
+        } //=>활성화 되어있는 하트 갯수에 따라 1씩증가
 
+        if (heartNum != curHP) //만약 하트 개수와 현재 체력이 다를 때
+        {
+            if (heartNum < curHP) //하트 개수가 현재 체력보다 적으면
+            {
+                for (int iNum02 = 0; iNum02 < curHP; iNum02++)
+                {
+                    hearts[iNum02].SetActive(true); //현재 체력만큼 하트 활성화
+                }
+            }
+
+            else if (heartNum > curHP) //하트 개수가 현재 체력보다 많으면
+            {
+                for (int iNum03 = hearts.Length - 1; iNum03 >= curHP; iNum03--)
+                {
+                    hearts[iNum03].SetActive(false); //현재 체력만큼 하트 비활성화
+                }
             }
         }
     }

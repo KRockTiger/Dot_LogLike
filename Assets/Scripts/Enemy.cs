@@ -87,6 +87,7 @@ public class Enemy : MonoBehaviour
             return;
         }
         Moving();
+        CheckPosition();
         CheckDeath();
     }
 
@@ -143,6 +144,39 @@ public class Enemy : MonoBehaviour
                 isHitting = false; //피격 판정 끄기
             }
         }
+    }
+
+    /// <summary>
+    /// 필드를 벗어 날려고 할 경우 방지
+    /// </summary>
+    private void CheckPosition()
+    {
+        //현재 위치를 체크
+        Vector3 checkPosition = transform.position;
+
+        //만약 정해진 영역을 넘으려고 하면 그 영역으로 이동시켜 막기
+        if (checkPosition.x <= -21.45f)
+        {
+            checkPosition.x = -21.45f;
+        }
+
+        if (checkPosition.x >= 21.45f)
+        {
+            checkPosition.x = 21.45f;
+        }
+
+        if (checkPosition.y <= -15.3f)
+        {
+            checkPosition.y = -15.3f;
+        }
+
+        if (checkPosition.y >= 15.3f)
+        {
+            checkPosition.y = 15.3f;
+        }
+
+        //조정된 위치를 다시 오브젝트에 적용
+        transform.position = checkPosition;
     }
 
     /// <summary>

@@ -360,8 +360,14 @@ MonoBehaviour:
   objDynamic: {fileID: 496849395}
   moveSpeed: 10
   dashSpeed: 80
-  maxHP: 10
+  maxHP: 4
   curHP: 0
+  hearts:
+  - {fileID: 53967141}
+  - {fileID: 1838264815}
+  - {fileID: 1493927374}
+  - {fileID: 1819331222}
+  - {fileID: 2002990438}
   isPassDamage: 0
   passMode: 0
 --- !u!1 &53967140
@@ -376,7 +382,7 @@ GameObject:
   - component: {fileID: 53967143}
   - component: {fileID: 53967142}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Heart00
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2147,7 +2153,7 @@ GameObject:
   m_Component:
   - component: {fileID: 994230419}
   m_Layer: 5
-  m_Name: Player
+  m_Name: PlayerUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2908,7 +2914,7 @@ GameObject:
   - component: {fileID: 1493927376}
   - component: {fileID: 1493927375}
   m_Layer: 5
-  m_Name: Image (2)
+  m_Name: Heart02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3421,7 +3427,7 @@ GameObject:
   - component: {fileID: 1819331224}
   - component: {fileID: 1819331223}
   m_Layer: 5
-  m_Name: Image (3)
+  m_Name: Heart03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3497,7 +3503,7 @@ GameObject:
   - component: {fileID: 1838264817}
   - component: {fileID: 1838264816}
   m_Layer: 5
-  m_Name: Image (1)
+  m_Name: Heart01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -50060,12 +50066,12 @@ GameObject:
   - component: {fileID: 2002990440}
   - component: {fileID: 2002990439}
   m_Layer: 5
-  m_Name: Image (4)
+  m_Name: Heart04
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2002990438
 RectTransform:
   m_ObjectHideFlags: 0

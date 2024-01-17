@@ -36,16 +36,17 @@ public class Player : MonoBehaviour
     }
     
     [Header("플레이어 스킬 셋팅")]
-    [SerializeField] private List<PlayerSkill> playerSkills;
-    [SerializeField] private List<TMP_Text> coolTimes;
-    [SerializeField] private Transform curSor;
-    [SerializeField] private Transform objDynamic;
+    [SerializeField] private List<PlayerSkill> playerSkills; //플레이어 스킬 리스트
+    [SerializeField] private List<TMP_Text> coolTimes; //스킬쿨타임 텍스트
+    [SerializeField] private Transform curSor; //커서오브젝트
+    [SerializeField] private Transform objDynamic; //소환할 오브젝트를 담을 오브젝트
 
     [Header("플레이어 스탯")]
-    [SerializeField] private float moveSpeed = 10f;
-    [SerializeField] private float dashSpeed = 10f;
-    [SerializeField] private float maxHP = 10f; //==>플레이어의 체력을 게이지가 아닌 칸으로 설정하는건 좋을까???
-    [SerializeField] private float curHP;
+    [SerializeField] private float moveSpeed = 10f; //일반 이동속도
+    [SerializeField] private float dashSpeed = 10f; //대쉬 이동속도
+    [SerializeField] private int maxHP = 5; //설정 체력
+    [SerializeField] private int curHP; //현재 체력
+    [SerializeField] private Transform[] hearts;
 
     [Header("플레이어 상태")]
     [SerializeField] private bool isPassDamage = false; //대쉬 중 무적효과를 적용
@@ -54,15 +55,15 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         mainCam = Camera.main;
-        curHP = maxHP;
+        curHP = maxHP; //현재 체력 설정
         spRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Start()
     {
-        defColor = spRenderer.color;
+        defColor = spRenderer.color; //현재 스프라이트 저장
         passColor = defColor;
-        passColor.a = 0.5f;
+        passColor.a = 0.5f; //데미지 무시 상태일 때의 스프라이트 저장
     }
 
     private void Update()
@@ -290,7 +291,7 @@ public class Player : MonoBehaviour
     /// <summary>
     /// 플레이어 피격하는 기능
     /// </summary>
-    public void PHit(float _damage)
+    public void PHit(int _damage)
     {
         if (isPassDamage || passMode)
         {
@@ -304,6 +305,23 @@ public class Player : MonoBehaviour
         Invoke("PassEnd", 1f);
     }
 
+    /// <summary>
+    /// 체력 변환이 될 때 사용
+    /// </summary>
+    private void HeartChange()
+    {
+        for (int iNum01 = 0; iNum01 <= hearts.Length;  iNum01++)
+        {
+            if (curHP <= 0)
+            {
+
+            }
+        }
+    }
+
+    /// <summary>
+    /// 무적 모드 풀기 위해 사용
+    /// </summary>
     private void PassEnd()
     {
         passMode = false;

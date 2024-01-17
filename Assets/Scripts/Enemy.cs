@@ -35,7 +35,7 @@ public class Enemy : MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             Player sc = collision.GetComponent<Player>();
-            sc.PHit(damage);
+            //sc.PHit(damage);
         } //=> 플레이어 태그를 감지하고 스크립트에 접근하여 데미지 주기
     }
     private void Awake()

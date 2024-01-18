@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
@@ -22,10 +23,11 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f; //이동속도
     [SerializeField] private float maxHP = 10f; //적용시킬 몬스터 체력
     [SerializeField] private float curHP; //현재 체력
-    [SerializeField] private float damage = 2f; //몬스터의 공격력
     [SerializeField] private float hitTime = 0f; //넉백 시간
+    [SerializeField] private int damage = 1; //몬스터의 공격력
     [SerializeField] private int haveCoin = 10; //현재 몬스터가 가지고 있는 코인 갯수
-    [SerializeField] private bool isBoss = false; //보스 여부
+    [SerializeField, Tooltip("보스 몬스터일 경우 true")] private bool isBoss = false; //보스 여부
+    [SerializeField, Tooltip("보스 몬스터만 사용")] private Image bossHPImage; //보스 체력 이미지
 
     [Header("테스트용")]
     [SerializeField] private bool skillTest = false;
@@ -35,7 +37,7 @@ public class Enemy : MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             Player sc = collision.GetComponent<Player>();
-            //sc.PHit(damage);
+            sc.PHit(damage);
         } //=> 플레이어 태그를 감지하고 스크립트에 접근하여 데미지 주기
     }
     private void Awake()
@@ -70,16 +72,21 @@ public class Enemy : MonoBehaviour
 
         if (!isSpawnTime || isBoss)
         {
+            gameManager.PSetBossBattle(true); //보스전 키기
             return;
         }
         spawnColor = new Color(defColor.r, defColor.g, defColor.b, 0.5f);
         spriteRenderer.color = spawnColor;
+        bossHPImage = GetComponent<Image>();
     }
 
-    private void Update()
+    public virtual void Update()
     {
         if (skillTest || isBoss)
-        { return; }
+        {
+            BossHPUI();
+            return;
+        }
 
         if (isSpawnTime)
         {
@@ -186,16 +193,31 @@ public class Enemy : MonoBehaviour
     {
         if (curHP <= 0f)
         {
-            Destroy(gameObject);
+            Destroy(gameObject); //오브젝트 파괴
 
             if (isDeath)
             {
-                return;
+                return; //중복 죽음 판정 방지
             }
 
-            gameManager.PSetCoin(haveCoin);
-            isDeath = true;
+            gameManager.PSetCoin(haveCoin); //게임 매니저에 코인 등록
+            isDeath = true; //죽음 판정
+            
+            if (isBoss) //만약 보스 몬스터일 경우
+            {
+                gameManager.PSetBossBattle(false); //보스전 끄기
+            }
         }
+
+    }
+
+    /// <summary>
+    /// 보스 몬스터일 경우 체력바 이미지를 실시간으로 적용
+    /// </summary>
+    private void BossHPUI()
+    {
+        bossHPImage.fillAmount = curHP / maxHP;
+        Debug.Log($"호출했음 => {curHP},{maxHP}");
     }
 
     /// <summary>

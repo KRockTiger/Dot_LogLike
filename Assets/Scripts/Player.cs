@@ -49,7 +49,7 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject[] hearts; //하트 UI를 담을 오브젝트 배열
     [SerializeField] private int curHP; //현재 체력
     [SerializeField] private int maxHP; //최대 체력
-    //private int setMaxHP = 5; //설정 가능한 최대 체력 ==> 최대 체력 증가 아이템을 먹었을 경우 막기 위한 코드
+    private int setMaxHP = 5; //설정 가능한 최대 체력 ==> 최대 체력 증가 아이템을 먹었을 경우 막기 위한 코드
 
     [Header("플레이어 상태")]
     [SerializeField] private bool isPassDamage = false; //대쉬 중 무적효과를 적용
@@ -373,6 +373,11 @@ public class Player : MonoBehaviour
     /// </summary>
     private void HeartCheck()
     {
+        if (curHP <= -1 || curHP > setMaxHP) //설정된 체력보다 오버될 경우
+        {
+            Debug.Log("설정한 체력보다 오버됬습니다.");
+            return;
+        }
         int heartNum = 0; //하트 개수를 담을 임의의 변수 생성
         
         for (int iNum01 = 0; iNum01 < hearts.Length;  iNum01++)

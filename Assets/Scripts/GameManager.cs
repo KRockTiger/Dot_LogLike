@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
-using System.Runtime.CompilerServices;
 
 public class GameManager : MonoBehaviour
 {
@@ -114,6 +114,14 @@ public class GameManager : MonoBehaviour
     public void PSetCoin(int _coin)
     {
         coin += _coin;
+    }
+
+    /// <summary>
+    /// 보스 몬스터가 소환될 때 사용
+    /// </summary>
+    public void PSetBossBattle(bool _bossBattle)
+    {
+        isBossBattle = _bossBattle;
     }
 }
 

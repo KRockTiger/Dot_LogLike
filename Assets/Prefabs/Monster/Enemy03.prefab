@@ -175,8 +175,8 @@ MonoBehaviour:
   moveSpeed: 3
   maxHP: 10
   curHP: 0
-  damage: 2
   hitTime: 0
+  damage: 1
   haveCoin: 10
   isBoss: 0
   skillTest: 0

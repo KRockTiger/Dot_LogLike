@@ -51269,7 +51269,10 @@ MonoBehaviour:
   - {fileID: 885013507}
   - {fileID: 1299880844}
   bossPhase: 1
+  isGrog: 0
   pokeSpeed: 65
+  setGrogTime: 3
+  curGrogTime: 0
   setDelayTime: 2
   curDelayTime: 0
   testStart: 0

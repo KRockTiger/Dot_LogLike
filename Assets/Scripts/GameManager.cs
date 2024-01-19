@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float spawnTimer; //실시간 타이머
     [SerializeField] private GameObject bossHPUI; //보스 체력 UI 오브젝트    
     [SerializeField] private bool isBossBattle = false; //보스전 유무 판정
+    //[SerializeField] private int bossPhase = 1; //보스페이즈
 
     [Header("소환 관리")]
     [SerializeField] private bool useSpawn = false;

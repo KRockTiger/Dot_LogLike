@@ -19,7 +19,7 @@ public class BossEnemy : Enemy
     {
         public GameObject objPattern; //사용할 스킬 오브젝트
         public PatternName patternName; //패턴 이름
-        public int setRepeatNum; //설정힐 패턴 횟수
+        public int setRepeatNum; //설정할 패턴 횟수
         public int curRepeatNum; //현재 반복한 패턴 횟수
         public float setDelayTime; //패턴에 딜레이를 넣고 싶을 때 사용
         public float curDelayTime; //현재 딜레이 시간
@@ -33,11 +33,14 @@ public class BossEnemy : Enemy
     [SerializeField] private float lavaRange; //라바 패턴 범위 설정
     [SerializeField] private Transform[] fireLineSpawnPoints; //불 장판 생성할 필드 넓이를 설정할 Transform
     [SerializeField] private int bossPhase = 1; //보스 페이즈 확인
+    [SerializeField] private bool isGrog = false; //그로기 상태
     private int randLava = 0; //라바 패턴은 2종류가 있으며 랜덤으로 하나를 적용 시키기 위해 Random.Range를 설정
     private bool isRand = true; //라바 패턴을 한 번만 결정하기 위해 사용
 
     [Header("보스 스텟")]
     [SerializeField] private float pokeSpeed = 20f; //찌르기 패턴의 이동 속도
+    [SerializeField] private float setGrogTime; //설정할 그로기 시간
+    [SerializeField] private float curGrogTime; //현재 그로기 시간
 
     private Vector3 posTarget; //플레이어의 위치를 타겟으로 넣을 벡터 변수
     private Vector3 minVector; //불 장판 최소점
@@ -59,24 +62,20 @@ public class BossEnemy : Enemy
 
     public override void Update()
     {
-        base.Update();
-
-        if (Input.GetKeyDown(KeyCode.T)) //테스트 설정
-        {
-            CheckPattern();
-        }
-
-        if (Input.GetKeyDown(KeyCode.C)) //임의로 페이즈 확인 후 적용
-        {
-            PhaseChange();
-        }
+        base.Update(); //일반몹 코드도 사용
 
         if (!UsingPattern && !testStart) //패턴 사용 중이 아니고 체인지 도중이 아닐경우
         {
             NextPattern(); //패턴 바꾸기
         }
 
-        if (UsingPattern) //패턴 사용이 등록 되면
+        if (isGrog)
+        {
+            GrogTime();
+            return;
+        }
+
+        if (UsingPattern) //패턴 사용이 등록되면
         {
             PatternManager(PatternName.PokePattern, bossPatterns[0].startPattern);
             PatternManager(PatternName.MeteorPattern, bossPatterns[1].startPattern);
@@ -90,6 +89,9 @@ public class BossEnemy : Enemy
     /// </summary>
     private void NextPattern()
     {
+        if (isGrog)
+        { return; }
+
         curDelayTime -= Time.deltaTime; //패턴 넘기는 딜레이 시간 적용
 
         if (curDelayTime <= 0f) //딜레이 타임이 끝나면
@@ -125,6 +127,8 @@ public class BossEnemy : Enemy
 
                 else //패턴 횟수가 3일 경우
                 {
+                    curGrogTime = setGrogTime; //그로기 시간 설정
+                    isGrog = true; //그로기 설정
                     ResetPattern(); //그로기 후 초기화를 위해 사용
                 }
                 break;
@@ -141,6 +145,8 @@ public class BossEnemy : Enemy
                     }
                 }
 
+                curGrogTime = setGrogTime; //그로기 시간 설정
+                isGrog = true; //그로기 설정
                 ResetPattern(); //모든 패턴이 사용되었으면 그로기 후 초기화를 위해 사용
                 break;
         }
@@ -330,8 +336,23 @@ public class BossEnemy : Enemy
     }
 
     /// <summary>
+    /// 그로기 상태에 빠지면 사용
+    /// </summary>
+    private void GrogTime()
+    {
+        curGrogTime -= Time.deltaTime; //그로기 타임
+
+        if (curGrogTime <= 0f)
+        {
+            curDelayTime = 0f; //딜레이 시간 초기화
+            isGrog = false;
+        }
+    }
+
+    /// <summary>
     /// 보스 패턴 관리
     /// - 매개변수를 Enum으로 사용하여 알맞은 패턴을 switch문에 적용
+    /// - 사용 방식은 PatternManager(사용할 패턴 이름, true로 만들면 발동)
     /// </summary>
     private void PatternManager(PatternName _pattern, bool _startPattern = false) //패턴 이름을 넣으며 평상시에 false로 넣기
     {
@@ -452,6 +473,46 @@ public class BossEnemy : Enemy
                 }
                 break;
         }
+    }
+
+    /// <summary>
+    /// 보스 피가 0이하 일 때 페이즈를 체크
+    /// - 버츄얼 함수를 사용
+    /// </summary>
+    public override void VPhaseCheck()
+    {
+        if (bossPhase != 2)
+        {
+            bossPhase += 1;
+            UsingPattern = false;
+            for (int iNum01 = 0; iNum01 < bossPatterns.Count; iNum01++) //사용중이던 패턴을 초기화
+            {
+                bossPatterns[iNum01].startPattern = false; //사용중이던 패턴 끄기
+                bossPatterns[iNum01].usedPattern = false; //사용된 패턴 초기화
+                bossPatterns[iNum01].curDelayTime = 0f; //딜레이 시간 초기화
+                bossPatterns[iNum01].curRepeatNum = 0; //반복 횟수 초기화
+            }
+            VSetHP(); //체력 적용
+            PhaseChange(); //페이즈 교체
+            curGrogTime = setGrogTime;
+            isGrog = true;
+        }
+
+        else
+        {
+            VDie();
+            Debug.Log("보스 처치");
+        }
+    }
+
+    public override void VDie()
+    {
+        base.VDie();
+    }
+
+    public override void VSetHP()
+    {
+        base.VSetHP();
     }
 
     /// <summary>

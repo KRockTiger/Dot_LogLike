@@ -82,6 +82,8 @@ public class Enemy : MonoBehaviour
 
     public virtual void Update()
     {
+        CheckDeath(); //모든 종류 몬스터에 사용
+
         if (skillTest || isBoss)
         {
             BossHPUI();
@@ -95,7 +97,6 @@ public class Enemy : MonoBehaviour
         }
         Moving();
         CheckPosition();
-        CheckDeath();
     }
 
     /// <summary>
@@ -193,22 +194,17 @@ public class Enemy : MonoBehaviour
     {
         if (curHP <= 0f)
         {
-            Destroy(gameObject); //오브젝트 파괴
-
-            if (isDeath)
+            switch (isBoss)
             {
-                return; //중복 죽음 판정 방지
-            }
+                case false: //보스 몬스터가 아닌 경우
+                    VDie(); //일반 적으로 죽이기
+                    break;
 
-            gameManager.PSetCoin(haveCoin); //게임 매니저에 코인 등록
-            isDeath = true; //죽음 판정
-            
-            if (isBoss) //만약 보스 몬스터일 경우
-            {
-                gameManager.PSetBossBattle(false); //보스전 끄기
+                case true: //보스 몬스터일 경우
+                    VPhaseCheck(); //페이즈 확인 후 판단하기 (페이즈 넘기기 혹은 죽음 판정하기)
+                    break;
             }
         }
-
     }
 
     /// <summary>
@@ -217,7 +213,6 @@ public class Enemy : MonoBehaviour
     private void BossHPUI()
     {
         bossHPImage.fillAmount = curHP / maxHP;
-        Debug.Log($"호출했음 => {curHP},{maxHP}");
     }
 
     /// <summary>
@@ -236,6 +231,43 @@ public class Enemy : MonoBehaviour
         hitDirection = _direction; //피격 방향 저장
         hitTime = 0.2f; //피격 시간
         isHitting = true; //피격 판정 키기
+    }
+
+    /// <summary>
+    /// 몬스터 죽음 판정
+    /// </summary>
+    public virtual void VDie()
+    {
+        Destroy(gameObject); //오브젝트 파괴
+
+        if (isDeath)
+        {
+            return; //중복 죽음 판정 방지
+        }
+
+        if (isBoss)
+        {
+            gameManager.PSetBossBattle(false); //보스전 끄기
+        }
+        gameManager.PSetCoin(haveCoin); //게임 매니저에 코인 등록
+        isDeath = true; //죽음 판정
+    }
+
+    /// <summary>
+    /// BossEnemy 스크립트에 접근하기 위한 버츄얼 함수
+    /// -보스 몬스터만 사용하므로 일반 몹은 아무것도 없다.
+    /// </summary>
+    public virtual void VPhaseCheck()
+    {
+
+    }
+
+    /// <summary>
+    /// 페이즈를 넘길 때 체력 초기화 하기 위한 버츄얼 함수
+    /// </summary>
+    public virtual void VSetHP()
+    {
+        curHP = maxHP;
     }
 
     public bool PIsSpawnTime()

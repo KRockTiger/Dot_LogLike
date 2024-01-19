@@ -8,7 +8,7 @@ public enum PlayerSkill //플레이어에게만 적용
     meteor,
     fireLaser,
     fireBall,
-    none, //플레이어 스킬이 아니면 등록
+    none, //=>플레이어 스킬이 아니면 등록
 }
 
 public enum BossSkill //보스에게만 적용
@@ -16,7 +16,7 @@ public enum BossSkill //보스에게만 적용
     fireBomb,
     lavaBoom,
     fireLine,
-    none, //보스 스킬이 아니면 등록
+    none, //=>보스 스킬이 아니면 등록
 }
 
 public class SkillManager : MonoBehaviour
@@ -81,6 +81,10 @@ public class SkillManager : MonoBehaviour
         MovingBossSkill(bossSkill);
     }
 
+    /// <summary>
+    /// 플레이어 스킬의 움직임
+    /// </summary>
+    /// <param name="_skill"></param>
     private void MovingPlayerSkill(PlayerSkill _skill) //스킬 움직임을 표현
     {
         if (isStop)
@@ -97,7 +101,7 @@ public class SkillManager : MonoBehaviour
                 transform.position += Vector3.down.normalized * downSpeed * Time.deltaTime;
                 break;
 
-            case PlayerSkill.fireLaser: //불 샷(?)
+            case PlayerSkill.fireLaser: //불기둥 샷
                 transform.position = playerPosition.position;
                 transform.Rotate(new Vector3(0f, 0f, (isRight == true ? 360f : -360f) * Time.deltaTime * moveSpeed));
                 break;
@@ -107,6 +111,10 @@ public class SkillManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 보스 스킬의 움직임
+    /// </summary>
+    /// <param name="_skill"></param>
     private void MovingBossSkill(BossSkill _skill)
     {
         if (isStop)
@@ -123,6 +131,9 @@ public class SkillManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 스킬의 방향 설정
+    /// </summary>
     private void CheckRight()
     {
         if (transform.localScale.x >= 0f)
@@ -141,11 +152,19 @@ public class SkillManager : MonoBehaviour
         direction = _direction;
     }
 
+    /// <summary>
+    /// 스킬이 날라가는 방향 설정
+    /// </summary>
+    /// <returns></returns>
     public Vector3 PGetDirection()
     {
         return direction;
     }
 
+    /// <summary>
+    /// 보스 스킬의 움직임을 제한하는 이벤트 버튼
+    /// - 일정 애니메이션에 사용
+    /// </summary>
     public void BStopMoving()
     {
         isStop = true;

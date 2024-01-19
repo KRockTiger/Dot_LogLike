@@ -362,9 +362,9 @@ public class Player : MonoBehaviour
         }
         curHP -= _damage;
         Debug.Log($"{_damage}만큼 피해를 입었습니다.");
-        passMode = true;
+        passMode = true; //피격 당한 후 무적 걸기
         spRenderer.color = passColor;
-        Invoke("PassEnd", 1f);
+        Invoke("PassEnd", 1f); //1초 후 무적 해제
     }
 
     /// <summary>
@@ -410,10 +410,11 @@ public class Player : MonoBehaviour
 
     /// <summary>
     /// 무적 모드 풀기 위해 사용
+    /// -Invoke용 함수
     /// </summary>
     private void PassEnd()
     {
-        passMode = false;
-        spRenderer.color = defColor;
+        passMode = false; //무적 끄기
+        spRenderer.color = defColor; //색깔 변경
     }
 }

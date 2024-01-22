@@ -102,9 +102,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 20
   downSpeed: 25
-  damage: 10
+  damage: 8
   playerSkill: 0
   bossSkill: 3
+  setDotTime: 0
+  curDotTime: 0
 --- !u!95 &3541389025446690453
 Animator:
   serializedVersion: 5

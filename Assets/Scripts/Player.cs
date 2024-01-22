@@ -8,6 +8,8 @@ using TMPro;
 
 public class Player : MonoBehaviour
 {
+    private GameManager gameManager;
+
     //캐릭터 기본 설정
     private float moveX; //x축 움직임
     private float moveY; //y축 움직임
@@ -46,6 +48,7 @@ public class Player : MonoBehaviour
     [Header("플레이어 스탯")]
     [SerializeField] private float moveSpeed = 10f; //일반 이동속도
     [SerializeField] private float dashSpeed = 10f; //대쉬 이동속도
+    [SerializeField] private float damage = 2f; //대쉬 이동속도
     [SerializeField] private GameObject[] hearts; //하트 UI를 담을 오브젝트 배열
     [SerializeField] private int curHP; //현재 체력
     [SerializeField] private int maxHP; //최대 체력
@@ -54,6 +57,42 @@ public class Player : MonoBehaviour
     [Header("플레이어 상태")]
     [SerializeField] private bool isPassDamage = false; //대쉬 중 무적효과를 적용
     [SerializeField] private bool passMode = false; //한번 피격을 당하면 1초동안 무적효과를 적용
+    [SerializeField] private bool isKey = false; //키 소지 여부
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Item")
+        {
+            Item itemSc = collision.GetComponent<Item>();
+            Item.ItemType itemType = itemSc.PGetItemType();
+
+            switch (itemType)
+            {
+                case Item.ItemType.attackPostion:
+                    break;
+                
+                case Item.ItemType.healthPostion:
+                    curHP += itemSc.PGetIntValue(); //물약에 기재된 숫자 만큼 회복
+                    Debug.Log($"{itemSc.PGetIntValue()}만큼 체력을 회복합니다.");
+                    if (curHP >= maxHP)
+                    {
+                        curHP = maxHP;
+                    }
+                    Destroy(collision.gameObject);
+                    break;
+                
+                case Item.ItemType.artifact:
+                    break;
+            }
+        }
+
+        if (collision.tag == "Key")
+        {
+            isKey = true;
+            gameManager.PSetBossKey();
+            Destroy(collision.gameObject);
+        }
+    }
 
     private void Awake()
     {
@@ -64,6 +103,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        gameManager = GameManager.Instance;
         defColor = spRenderer.color; //현재 스프라이트 저장
         passColor = defColor;
         passColor.a = 0.5f; //데미지 무시 상태일 때의 스프라이트 저장
@@ -238,10 +278,12 @@ public class Player : MonoBehaviour
                     localMeteor.x *= -1;
                     objMeteor.transform.localScale = localMeteor;
                 }
-                Vector3 tarMeteor = posTarget;
-                tarMeteor.x += (isRight) ? -10f : 10f;
+                Vector3 tarMeteor = posTarget; //메테오를 맞출 좌표
+                tarMeteor.x += (isRight) ? -10f : 10f; //캐릭터 방향에 맞게 Scale 조정
                 tarMeteor.y += 15f; //아래로 떨어지다가 적중을 해야 하므로 위로 설정
-                Instantiate(objMeteor, tarMeteor, Quaternion.identity, objDynamic); //메테오 소환
+                GameObject insMeteor = Instantiate(objMeteor, tarMeteor, Quaternion.identity, objDynamic); //메테오 소환
+                SkillManager scMeteor = insMeteor.GetComponent<SkillManager>();
+                scMeteor.PGetDamage(damage); //스킬에 데미지 넣기
                 break;
 
             case KeyCode.E:
@@ -258,17 +300,20 @@ public class Player : MonoBehaviour
                     localLaser.x *= -1;
                     objLaser.transform.localScale = localLaser;
                 }
-                Instantiate(objLaser, transform.position, Quaternion.identity, objDynamic);
+                GameObject insLaser = Instantiate(objLaser, transform.position, Quaternion.identity, objDynamic);
+                SkillManager scLaser = insLaser.GetComponent<SkillManager>();
+                scLaser.PGetDamage(damage);
                 break;
 
             case KeyCode.Mouse0:
                 GameObject obj = Instantiate(playerSkills[2].skillObject, transform.position, rotTarget, objDynamic);
-                SkillManager sc = obj.GetComponent<SkillManager>();
-                sc.PSetDirection(direction);
+                SkillManager scFireball = obj.GetComponent<SkillManager>();
+                scFireball.PSetDirection(direction);
+                scFireball.PGetDamage(damage);
                 break;
 
             case KeyCode.Mouse1:
-                isDash = true;                
+                isDash = true;
                 break;
         }
     }
@@ -351,23 +396,6 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// 플레이어 피격하는 기능
-    /// </summary>
-    public void PHit(int _damage)
-    {
-        if (isPassDamage || passMode)
-        {
-            Debug.Log($"현재 보호를 받는 상태입니다.");
-            return;
-        }
-        curHP -= _damage;
-        Debug.Log($"{_damage}만큼 피해를 입었습니다.");
-        passMode = true; //피격 당한 후 무적 걸기
-        spRenderer.color = passColor;
-        Invoke("PassEnd", 1f); //1초 후 무적 해제
-    }
-
-    /// <summary>
     /// 체력 변환이 될 때 사용
     /// UI적용만 쓰는 함수
     /// </summary>
@@ -406,6 +434,46 @@ public class Player : MonoBehaviour
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 플레이어 피격하는 기능
+    /// </summary>
+    public void PHit(int _damage)
+    {
+        if (isPassDamage || passMode)
+        {
+            Debug.Log($"현재 보호를 받는 상태입니다.");
+            return;
+        }
+        curHP -= _damage;
+        passMode = true; //피격 당한 후 무적 걸기
+        spRenderer.color = passColor;
+        Invoke("PassEnd", 1f); //1초 후 무적 해제
+
+        if (curHP <= 0)
+        {
+            Die();
+        }
+    }
+
+    /// <summary>
+    /// 플레이어 죽음 판정
+    /// </summary>
+    private void Die()
+    {
+        Destroy(gameObject);
+        gameManager.PSetEndGame();
+        gameManager.PPlayerDie();
+    }
+
+    /// <summary>
+    /// 스킬 스크립트에 공격력을 공유
+    /// </summary>
+    /// <returns></returns>
+    public float PSetDamage()
+    {
+        return damage;
     }
 
     /// <summary>

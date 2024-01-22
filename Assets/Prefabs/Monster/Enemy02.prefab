@@ -171,6 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 200902f63294e7d4db0eaddb9816bede, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 0}
   isSpawnTime: 1
   moveSpeed: 3
   maxHP: 10
@@ -179,4 +180,6 @@ MonoBehaviour:
   damage: 1
   haveCoin: 10
   isBoss: 0
-  skillTest: 0
+  isElite: 0
+  bossHPImage: {fileID: 0}
+  objItem: {fileID: 548491098324783014, guid: f81868cc2b16d104d92743529208cb78, type: 3}

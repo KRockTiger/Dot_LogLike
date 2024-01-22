@@ -35,7 +35,9 @@ public class BossEnemy : Enemy
     [SerializeField] private int bossPhase = 1; //보스 페이즈 확인
     [SerializeField] private bool isGrog = false; //그로기 상태
     private int randLava = 0; //라바 패턴은 2종류가 있으며 랜덤으로 하나를 적용 시키기 위해 Random.Range를 설정
+    private int randUpgrade = 0; //업그레이드 패턴을 적용시키기 위해 Random.Range를 설정
     private bool isRand = true; //라바 패턴을 한 번만 결정하기 위해 사용
+    private bool isUpPattern = false; //업그레이드 패턴 발동하기 위한 트리거
 
     [Header("보스 스텟")]
     [SerializeField] private float pokeSpeed = 20f; //찌르기 패턴의 이동 속도
@@ -60,11 +62,22 @@ public class BossEnemy : Enemy
     [SerializeField] private float curDelayTime; //다음 패턴 발동하기의 현재 딜레이 시간    
     [SerializeField] private bool testStart = false; //테스트시작
 
+    private void Start()
+    {
+        gameManager = GameManager.Instance;
+        gameManager.PSetBossBattle(true); //보스전 키기
+        curGrogTime = 1f;
+        isGrog = true;
+    }
+
     public override void Update()
     {
         base.Update(); //일반몹 코드도 사용
+        gameManager.PBossPhaseUI(bossPhase);
 
-        if (!UsingPattern && !testStart) //패턴 사용 중이 아니고 체인지 도중이 아닐경우
+        if (testStart) { return; }
+
+        if (!UsingPattern) //패턴 사용 중이 아니고 체인지 도중이 아닐경우
         {
             NextPattern(); //패턴 바꾸기
         }
@@ -75,12 +88,17 @@ public class BossEnemy : Enemy
             return;
         }
 
-        if (UsingPattern) //패턴 사용이 등록되면
+        if (UsingPattern && !isUpPattern) //패턴 사용이 등록되고 3페이즈에 업그레이드 패턴 발동이 아닌 경우
         {
             PatternManager(PatternName.PokePattern, bossPatterns[0].startPattern);
             PatternManager(PatternName.MeteorPattern, bossPatterns[1].startPattern);
             PatternManager(PatternName.LavaPattern, bossPatterns[2].startPattern);
             PatternManager(PatternName.LinePattern, bossPatterns[3].startPattern);
+        }
+
+        if (isUpPattern) //업그레이드 패턴이 발동되면
+        {
+            UpgradePattern(randUpgrade);
         }
     }
 
@@ -149,6 +167,21 @@ public class BossEnemy : Enemy
                 isGrog = true; //그로기 설정
                 ResetPattern(); //모든 패턴이 사용되었으면 그로기 후 초기화를 위해 사용
                 break;
+
+            case 3: //3페이즈일 경우
+
+                for (int iNum01 = 0; iNum01 < bossPatterns.Count; iNum01++) //패턴 목록 탐지
+                {
+                    if (!bossPatterns[iNum01].usedPattern) //만약 사용 안한 패턴이 있으면
+                    {
+                        ChangePattern(); //패턴 변화 시킨후 발동
+
+                        return;
+                    }
+                }
+                randUpgrade = Random.Range(0, 2);
+                isUpPattern = true; //업그레이드 패턴 발동
+                break;
         }
     }
 
@@ -168,7 +201,6 @@ public class BossEnemy : Enemy
             }
         }
 
-        Debug.Log(randNum); //패턴 사용 횟수 확인용 디버그
         bossPatterns[randNum].startPattern = true; //패턴 발동
         UsingPattern = true; //패턴 사용 등록
     }
@@ -359,12 +391,6 @@ public class BossEnemy : Enemy
         switch (_pattern)
         {
             case PatternName.PokePattern: //찌르기 패턴 -------------------------------------------------------------------------------------------------
-                if (Input.GetKeyDown(KeyCode.Alpha1)) //패턴 발동 트리거
-                {
-                    bossPatterns[0].startPattern = true;
-                    bossPatterns[0].rePattern = true;
-                }
-
                 if (bossPatterns[0].rePattern && _startPattern) //패턴 시작하거나 재사용할 경우
                 {
                     bossPatterns[0].curRepeatNum += 1; //패턴 횟수 1증가
@@ -386,12 +412,6 @@ public class BossEnemy : Enemy
                 break;
 
             case PatternName.MeteorPattern: //메테오 패턴 --------------------------------------------------------------------------------------------------
-                if (Input.GetKeyDown(KeyCode.Alpha2)) //패턴 발동 트리거
-                {
-                    bossPatterns[1].startPattern = true;
-                    bossPatterns[1].curDelayTime = bossPatterns[1].setDelayTime;
-                }
-
                 if (bossPatterns[1].curRepeatNum != bossPatterns[1].setRepeatNum && bossPatterns[1].startPattern) //연속으로 쓴 횟수와 설정한 연속 횟수가 맞지 않고 패턴 사용중일 경우
                 {
                     bossPatterns[1].curDelayTime -= Time.deltaTime; //다시 쓰기 까지의 딜레이 시간
@@ -414,16 +434,12 @@ public class BossEnemy : Enemy
                 }
                 break;
 
-            case PatternName.LavaPattern: //라바 패턴 -----------------------------------------------------------------------------------------------------
-                if (Input.GetKeyDown(KeyCode.Alpha3)) //패턴 발동 트리거
+            case PatternName.LavaPattern: //라바 패턴 -----------------------------------------------------------------------------------------------------                
+                if (isRand && bossPatterns[2].startPattern)
                 {
-                    bossPatterns[2].startPattern = true;
+                    lavaRange = 0f;
                     randLava = Random.Range(0, 2); //두 가지의 라바 패턴 중 하나를 결정
-                }
-
-                if (isRand)
-                {
-                    randLava = Random.Range(0, 2); //두 가지의 라바 패턴 중 하나를 결정
+                    Debug.Log("랜드 오픈");
                     isRand = false;
                 }
 
@@ -460,10 +476,6 @@ public class BossEnemy : Enemy
                 break;
 
             case PatternName.LinePattern: //불 장판 패턴 --------------------------------------------------------------------------------------------
-                if (Input.GetKeyDown(KeyCode.Alpha4))
-                {
-                    bossPatterns[3].startPattern = true;
-                }
                 if (bossPatterns[3].startPattern == true)
                 {
                     SpawnFireLine(); //오브젝트 생성
@@ -476,12 +488,99 @@ public class BossEnemy : Enemy
     }
 
     /// <summary>
+    /// 3페이즈 상태에서 4개 패턴 다 사용한 후 강화 패턴을 사용
+    /// 강화 패턴은 총 3개이고 그 중 하나를 랜덤으로 발동
+    /// false로 잠가놨다가 true로 해방
+    /// </summary>
+    private void UpgradePattern(int _randPattern)
+    {
+        switch (_randPattern)
+        {
+            case 0:
+                    UpGradeLavaBoom01();
+                    isUpPattern = false;
+                    curGrogTime = setGrogTime; //그로기 시간 설정
+                    isGrog = true; //그로기 설정
+                    ResetPattern(); //모든 패턴이 사용되었으면 그로기 후 초기화를 위해 사용                
+                break;
+
+            case 1:
+                UpGradeLavaBoom02();
+                isUpPattern = false;
+                curGrogTime = setGrogTime; //그로기 시간 설정
+                isGrog = true; //그로기 설정
+                ResetPattern(); //모든 패턴이 사용되었으면 그로기 후 초기화를 위해 사용   
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 업그레이드 라바 패턴 01
+    /// </summary>
+    private void UpGradeLavaBoom01()
+    {
+        lavaRange = 0f;
+        lavaRange += 5f;
+        Vector3 rangePX01 = new Vector3(transform.position.x + lavaRange, transform.position.y, 0f);
+        Vector3 rangeMX01 = new Vector3(transform.position.x - lavaRange, transform.position.y, 0f);
+        Vector3 rangePY01 = new Vector3(transform.position.x, transform.position.y + lavaRange, 0f);
+        Vector3 rangeMY01 = new Vector3(transform.position.x, transform.position.y - lavaRange, 0f);
+        Instantiate(bossPatterns[2].objPattern, rangePX01, Quaternion.identity); //오른쪽
+        Instantiate(bossPatterns[2].objPattern, rangeMX01, Quaternion.identity); //왼쪽
+        Instantiate(bossPatterns[2].objPattern, rangePY01, Quaternion.identity); //위
+        Instantiate(bossPatterns[2].objPattern, rangeMY01, Quaternion.identity); //아래
+
+        for (int iNum01 = 0; iNum01 < 8; iNum01++)
+        {
+            lavaRange += 5f;
+            Vector3 rangePX02 = new Vector3(transform.position.x + lavaRange, transform.position.y, 0f);
+            Vector3 rangeMX02 = new Vector3(transform.position.x - lavaRange, transform.position.y, 0f);
+            Vector3 rangePY02 = new Vector3(transform.position.x, transform.position.y + lavaRange, 0f);
+            Vector3 rangeMY02 = new Vector3(transform.position.x, transform.position.y - lavaRange, 0f);
+            Instantiate(bossPatterns[2].objPattern, rangePX02, Quaternion.identity); //오른쪽
+            Instantiate(bossPatterns[2].objPattern, rangeMX02, Quaternion.identity); //왼쪽
+            Instantiate(bossPatterns[2].objPattern, rangePY02, Quaternion.identity); //위
+            Instantiate(bossPatterns[2].objPattern, rangeMY02, Quaternion.identity); //아래
+        }
+    }
+
+    /// <summary>
+    /// 업그레이드 라바 패턴 02
+    /// </summary>
+    private void UpGradeLavaBoom02()
+    {
+        lavaRange = 0f;
+        lavaRange += 5f;
+        Vector3 rangePXPY01 = new Vector3(transform.position.x + lavaRange, transform.position.y + lavaRange, 0f);
+        Vector3 rangePXMY01 = new Vector3(transform.position.x + lavaRange, transform.position.y - lavaRange, 0f);
+        Vector3 rangeMXPY01 = new Vector3(transform.position.x - lavaRange, transform.position.y + lavaRange, 0f);
+        Vector3 rangeMXMY01 = new Vector3(transform.position.x - lavaRange, transform.position.y - lavaRange, 0f);
+        Instantiate(bossPatterns[2].objPattern, rangePXPY01, Quaternion.identity); //오른쪽 위
+        Instantiate(bossPatterns[2].objPattern, rangePXMY01, Quaternion.identity); //오른쪽 아래
+        Instantiate(bossPatterns[2].objPattern, rangeMXPY01, Quaternion.identity); //왼쪽 위
+        Instantiate(bossPatterns[2].objPattern, rangeMXMY01, Quaternion.identity); //왼쪽 아래
+
+        for (int iNum01 = 0; iNum01 < 8; iNum01++)
+        {
+            lavaRange += 5f;
+            Vector3 rangePXPY02 = new Vector3(transform.position.x + lavaRange, transform.position.y + lavaRange, 0f);
+            Vector3 rangePXMY02 = new Vector3(transform.position.x + lavaRange, transform.position.y - lavaRange, 0f);
+            Vector3 rangeMXPY02 = new Vector3(transform.position.x - lavaRange, transform.position.y + lavaRange, 0f);
+            Vector3 rangeMXMY02 = new Vector3(transform.position.x - lavaRange, transform.position.y - lavaRange, 0f);
+            Instantiate(bossPatterns[2].objPattern, rangePXPY02, Quaternion.identity); //오른쪽 위
+            Instantiate(bossPatterns[2].objPattern, rangePXMY02, Quaternion.identity); //오른쪽 아래
+            Instantiate(bossPatterns[2].objPattern, rangeMXPY02, Quaternion.identity); //왼쪽 위
+            Instantiate(bossPatterns[2].objPattern, rangeMXMY02, Quaternion.identity); //왼쪽 아래
+        }
+    }
+
+    /// <summary>
     /// 보스 피가 0이하 일 때 페이즈를 체크
     /// - 버츄얼 함수를 사용
     /// </summary>
     public override void VPhaseCheck()
     {
-        if (bossPhase != 2)
+        if (bossPhase != 3)
         {
             bossPhase += 1;
             UsingPattern = false;
@@ -501,7 +600,6 @@ public class BossEnemy : Enemy
         else
         {
             VDie();
-            Debug.Log("보스 처치");
         }
     }
 
@@ -513,48 +611,5 @@ public class BossEnemy : Enemy
     public override void VSetHP()
     {
         base.VSetHP();
-    }
-
-    /// <summary>
-    /// 3페이즈 상태에서 4개 패턴 다 사용한 후 강화 패턴을 사용
-    /// 강화 패턴은 총 3개이고 그 중 하나를 랜덤으로 발동
-    /// </summary>
-    private void UpgradePattern()
-    {
-        int randPattern = Random.Range(0, 3);
-
-        switch (randPattern)
-        {
-            case 0:
-                lavaRange += 5f;
-                Vector3 rangePlusX01 = new Vector3(transform.position.x + lavaRange, transform.position.y, 0f);
-                Vector3 rangeMinusX01 = new Vector3(transform.position.x - lavaRange, transform.position.y, 0f);
-                Vector3 rangePlusY01 = new Vector3(transform.position.x, transform.position.y + lavaRange, 0f);
-                Vector3 rangeMinusY01 = new Vector3(transform.position.x, transform.position.y - lavaRange, 0f);
-                Instantiate(bossPatterns[2].objPattern, rangePlusX01, Quaternion.identity); //오른쪽
-                Instantiate(bossPatterns[2].objPattern, rangeMinusX01, Quaternion.identity); //왼쪽
-                Instantiate(bossPatterns[2].objPattern, rangePlusY01, Quaternion.identity); //위
-                Instantiate(bossPatterns[2].objPattern, rangeMinusY01, Quaternion.identity); //아래
-
-                for (int iNum01 = 0; iNum01 < 8; iNum01++)
-                {
-                    lavaRange += 5f;
-                    Vector3 rangePlusX02 = new Vector3(transform.position.x + lavaRange, transform.position.y, 0f);
-                    Vector3 rangeMinusX02 = new Vector3(transform.position.x - lavaRange, transform.position.y, 0f);
-                    Vector3 rangePlusY02 = new Vector3(transform.position.x, transform.position.y + lavaRange, 0f);
-                    Vector3 rangeMinusY02 = new Vector3(transform.position.x, transform.position.y - lavaRange, 0f);
-                    Instantiate(bossPatterns[2].objPattern, rangePlusX02, Quaternion.identity); //오른쪽
-                    Instantiate(bossPatterns[2].objPattern, rangeMinusX02, Quaternion.identity); //왼쪽
-                    Instantiate(bossPatterns[2].objPattern, rangePlusY02, Quaternion.identity); //위
-                    Instantiate(bossPatterns[2].objPattern, rangeMinusY02, Quaternion.identity); //아래
-                }
-                break;
-
-            case 1:
-                break;
-
-            case 2:
-                break;
-        }
     }
 }

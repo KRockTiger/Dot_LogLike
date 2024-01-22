@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
-    private GameManager gameManager;
+    public GameManager gameManager;
 
     private Transform trsPlayer; //플레이어 위치
     private bool isHitting = false; //넉백 확인
@@ -27,10 +27,14 @@ public class Enemy : MonoBehaviour
     [SerializeField] private int damage = 1; //몬스터의 공격력
     [SerializeField] private int haveCoin = 10; //현재 몬스터가 가지고 있는 코인 갯수
     [SerializeField, Tooltip("보스 몬스터일 경우 true")] private bool isBoss = false; //보스 여부
+    [SerializeField, Tooltip("엘리트 몬스터일 경우 true")] private bool isElite = false; //보스 여부
     [SerializeField, Tooltip("보스 몬스터만 사용")] private Image bossHPImage; //보스 체력 이미지
 
-    [Header("테스트용")]
-    [SerializeField] private bool skillTest = false;
+    [Header("아이템")]
+    [SerializeField] private GameObject objItem;
+
+    //[Header("테스트용")]
+    //[SerializeField] private bool skillTest = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -72,9 +76,10 @@ public class Enemy : MonoBehaviour
 
         if (!isSpawnTime || isBoss)
         {
-            gameManager.PSetBossBattle(true); //보스전 키기
+            //gameManager.PSetBossBattle(true); //보스전 키기
             return;
         }
+
         spawnColor = new Color(defColor.r, defColor.g, defColor.b, 0.5f);
         spriteRenderer.color = spawnColor;
         bossHPImage = GetComponent<Image>();
@@ -84,7 +89,7 @@ public class Enemy : MonoBehaviour
     {
         CheckDeath(); //모든 종류 몬스터에 사용
 
-        if (skillTest || isBoss)
+        if (isBoss)
         {
             BossHPUI();
             return;
@@ -221,11 +226,11 @@ public class Enemy : MonoBehaviour
     /// <param 피격 방향="_direction">피격을 당한 방향을 나타냄</param>
     public void PHit(Vector3 _direction, float _damage)
     {
-        if (skillTest)
-        {
-            Debug.Log("몬스터가 스킬 영향을 받았습니다.");
-            return;
-        }
+        //if (skillTest)
+        //{
+        //    Debug.Log("몬스터가 스킬 영향을 받았습니다.");
+        //    return;
+        //}
 
         curHP -= _damage;
         hitDirection = _direction; //피격 방향 저장
@@ -245,9 +250,26 @@ public class Enemy : MonoBehaviour
             return; //중복 죽음 판정 방지
         }
 
+        if (!isElite && !isBoss) //랜덤 드랍
+        {
+            int randDrop = Random.Range(0, 5);
+            if (randDrop == 0)
+            {
+                Instantiate(objItem, transform.position, Quaternion.identity);
+            }
+        }
+
+        if (isElite)
+        {
+            Instantiate(objItem, transform.position, Quaternion.identity);
+            gameManager.PSetEndElite();
+        }
+
         if (isBoss)
         {
             gameManager.PSetBossBattle(false); //보스전 끄기
+            gameManager.PSetEndGame();
+            gameManager.PClearGame();
         }
         gameManager.PSetCoin(haveCoin); //게임 매니저에 코인 등록
         isDeath = true; //죽음 판정

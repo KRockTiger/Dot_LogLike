@@ -28,12 +28,14 @@ public class SkillManager : MonoBehaviour
     //[SerializeField, Tooltip("단일기일 경우 true")] private bool oneTarget = false;
     [SerializeField] private PlayerSkill playerSkill;
     [SerializeField] private BossSkill bossSkill;
+    [SerializeField] private float setDotTime; //설정할 도트데미지 시간
+    [SerializeField] private float curDotTime; //현재 도트데미지 시간
 
     private Vector3 direction;
     private Transform playerPosition;
     private BoxCollider2D boxCollider;
     private CircleCollider2D circleCollider;
-    private bool isStop = false;
+    private bool isStop = false; //스킬 이동 제어
     private bool isRight = true;
     private bool isHit = false; //단일기일 경우 스킬 하나에 한마리만 맞게 해주는 bool형
 
@@ -42,9 +44,17 @@ public class SkillManager : MonoBehaviour
         if (collision.gameObject.tag == "Enemy" && bossSkill == BossSkill.none) //플레이어의 공격
         {
             Enemy enemy = collision.GetComponent<Enemy>();
-            if (enemy.PIsSpawnTime() || isHit) //몬스터가 스폰 중일 경우
+            if (playerSkill == PlayerSkill.fireBall) //파이어 볼일 때
             {
-                if (playerSkill == PlayerSkill.fireBall) //단일기일 경우 막기
+                if (enemy.PIsSpawnTime() || isHit) //단일기일 경우 막기
+                {
+                    return;
+                }
+            }
+
+            if (playerSkill == PlayerSkill.fireLaser)
+            {
+                if (enemy.PIsSpawnTime()) //스폰중 레이저 기술의 데미지 막기
                 {
                     return;
                 }
@@ -57,13 +67,32 @@ public class SkillManager : MonoBehaviour
                 Destroy(gameObject);
             }
         }
+
+        if (collision.gameObject.tag == "Player" && playerSkill == PlayerSkill.none)
+        {
+            Player player = collision.GetComponent<Player>();
+            if (bossSkill == BossSkill.fireBomb || bossSkill == BossSkill.lavaBoom)
+            {
+                player.PHit(1);
+            }
+
+            if (bossSkill == BossSkill.fireLine)
+            {
+                curDotTime -= Time.deltaTime;
+
+                if (curDotTime <= 0f)
+                {
+                    player.PHit(1); //시간에 맞춰 데미지 넣기
+                }
+            }
+        }
     }
 
     private void Awake()
     {
         playerPosition = GameObject.Find("Player").transform; //플레이어의 위치를 저장
 
-        if (playerSkill == PlayerSkill.fireBall || playerSkill == PlayerSkill.fireLaser)
+        if (playerSkill == PlayerSkill.fireBall || playerSkill == PlayerSkill.fireLaser || bossSkill == BossSkill.fireBomb || bossSkill == BossSkill.lavaBoom || bossSkill == BossSkill.fireLine)
         {
             boxCollider = GetComponent<BoxCollider2D>(); //콜리더 가져오기
         }
@@ -162,12 +191,21 @@ public class SkillManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 플레이어 혹은 몬스터에 설정된 공격력을 스킬에 부여
+    /// </summary>
+    /// <param name="_damage"></param>
+    public void PGetDamage(float _damage)
+    {
+        damage += _damage;
+    }
+
+    /// <summary>
     /// 보스 스킬의 움직임을 제한하는 이벤트 버튼
     /// - 일정 애니메이션에 사용
     /// </summary>
     public void BStopMoving()
     {
-        isStop = true;
+         isStop = true;
         
         if (playerSkill == PlayerSkill.fireBall)
         {
@@ -178,6 +216,11 @@ public class SkillManager : MonoBehaviour
         {
             circleCollider.enabled = true;
         }
+    }
+
+    public void BGetTrigger()
+    {
+        boxCollider.enabled = true;
     }
 
     /// <summary>

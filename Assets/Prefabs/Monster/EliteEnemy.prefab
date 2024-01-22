@@ -171,9 +171,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 200902f63294e7d4db0eaddb9816bede, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 0}
+  isSpawnTime: 1
   moveSpeed: 5
   maxHP: 50
   curHP: 0
-  damage: 5
   hitTime: 0
-  haveCoin: 30
+  damage: 2
+  haveCoin: 100
+  isBoss: 0
+  isElite: 1
+  bossHPImage: {fileID: 0}
+  objItem: {fileID: 5550474918064034618, guid: cd104627a80ec994393da4bbb7e6d7bd, type: 3}

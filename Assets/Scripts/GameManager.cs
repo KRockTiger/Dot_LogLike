@@ -80,9 +80,9 @@ public class GameManager : MonoBehaviour
         {
             DestroyAllEnemy();
         }
-        GameCheck();
-        WaitEliteSpawn();
-        //InventoryUI();
+        GameCheck(); //게임 상태 확인하여 멈춤 설정
+        WaitEliteSpawn(); //엘리트 보스 소환 대기
+        InventoryUI();
         coinText.text = coin.ToString() + "$";
         BossHPUI();
         if (!useSpawn)
@@ -119,14 +119,16 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void GameCheck()
     {
-        if (gameEnd)
+        if (gameEnd || gamePause)
         {
             Time.timeScale = 0f;
+            Cursor.visible = true;
         }
 
-        else
+        else if (!gameEnd && !gamePause)
         {
             Time.timeScale = 1f;
+            Cursor.visible = false;
         }
     }
 
@@ -137,10 +139,10 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.B)) //키를 누를때마다 변경
         {
+            gamePause = !gamePause;
             isInventory = !isInventory;
         }
-
-        inventoryUI.SetActive(isInventory);
+        inventoryUI.SetActive(gamePause);
     }
 
     /// <summary>
@@ -279,6 +281,10 @@ public class GameManager : MonoBehaviour
         isBossBattle = _bossBattle;
     }
 
+    /// <summary>
+    /// 게임 시작
+    /// </summary>
+    /// <param name="_start"></param>
     public void PSetStartGame(bool _start)
     {
         useSpawn = _start;
@@ -287,6 +293,9 @@ public class GameManager : MonoBehaviour
         keyManual.SetActive(!_start);
     }
 
+    /// <summary>
+    /// 엘리트 몬스터가 소환이 되면 등록
+    /// </summary>
     public void PSetEndElite()
     {
         useSpawn = false;
@@ -333,6 +342,9 @@ public class GameManager : MonoBehaviour
         gameClearUI.SetActive(true);
     }
 
+    /// <summary>
+    /// 버튼 : 게임씬 다시 불러오기
+    /// </summary>
     public void BTryGame()
     {
         SceneManager.LoadSceneAsync("PlayScene"); //"PlayScene"

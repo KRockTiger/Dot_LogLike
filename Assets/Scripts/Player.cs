@@ -476,6 +476,11 @@ public class Player : MonoBehaviour
         return damage;
     }
 
+    public void PSetCursor(bool _set)
+    {
+        curSor.gameObject.SetActive(_set);
+    }
+
     /// <summary>
     /// 무적 모드 풀기 위해 사용
     /// -Invoke용 함수

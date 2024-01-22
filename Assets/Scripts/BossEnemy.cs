@@ -599,15 +599,21 @@ public class BossEnemy : Enemy
 
         else
         {
-            VDie();
+            VDie(); //부모 스크립트의 함수 사용
         }
     }
 
+    /// <summary>
+    /// 버츄얼 함수 사용
+    /// </summary>
     public override void VDie()
     {
         base.VDie();
     }
 
+    /// <summary>
+    /// 버츄얼 함수 사용
+    /// </summary>
     public override void VSetHP()
     {
         base.VSetHP();

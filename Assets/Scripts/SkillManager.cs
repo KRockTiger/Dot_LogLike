@@ -25,9 +25,8 @@ public class SkillManager : MonoBehaviour
     [SerializeField] private float moveSpeed = 3f;
     [SerializeField] private float downSpeed; //메테오 떨어지는 속도
     [SerializeField] private float damage = 2f;
-    //[SerializeField, Tooltip("단일기일 경우 true")] private bool oneTarget = false;
-    [SerializeField] private PlayerSkill playerSkill;
-    [SerializeField] private BossSkill bossSkill;
+    [SerializeField] private PlayerSkill playerSkill; //플레이어 스킬일 경우 사용
+    [SerializeField] private BossSkill bossSkill; //보스 스킬일 경우 사용
     [SerializeField] private float setDotTime; //설정할 도트데미지 시간
     [SerializeField] private float curDotTime; //현재 도트데미지 시간
 
@@ -82,7 +81,7 @@ public class SkillManager : MonoBehaviour
 
                 if (curDotTime <= 0f)
                 {
-                    player.PHit(1); //시간에 맞춰 데미지 넣기
+                    player.PHit(1); //시간에 맞춰 데미지 넣기(도트딜)
                 }
             }
         }
@@ -132,7 +131,7 @@ public class SkillManager : MonoBehaviour
 
             case PlayerSkill.fireLaser: //불기둥 샷
                 transform.position = playerPosition.position;
-                transform.Rotate(new Vector3(0f, 0f, (isRight == true ? 360f : -360f) * Time.deltaTime * moveSpeed));
+                transform.Rotate(new Vector3(0f, 0f, (isRight == true ? -360f : 360f) * Time.deltaTime * moveSpeed));
                 break;
 
             case PlayerSkill.none:

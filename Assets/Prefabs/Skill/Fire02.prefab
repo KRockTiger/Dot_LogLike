@@ -102,7 +102,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 20
   downSpeed: 25
-  damage: 8
+  damage: 18
   playerSkill: 0
   bossSkill: 3
   setDotTime: 0

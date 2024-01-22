@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &3004609374599232111
+--- !u!1 &5956125047226659493
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,40 +8,40 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5151784062095776144}
-  - component: {fileID: 5940548332283951501}
-  - component: {fileID: 641576626602978614}
-  - component: {fileID: 6532485069669086195}
-  - component: {fileID: 5839075952822643441}
+  - component: {fileID: 475791922823469860}
+  - component: {fileID: 2473970178893423521}
+  - component: {fileID: 3900023798022020368}
+  - component: {fileID: 3007309040838937678}
+  - component: {fileID: 7246248274108257627}
   m_Layer: 0
-  m_Name: Enemy03
+  m_Name: BossEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5151784062095776144
+--- !u!4 &475791922823469860
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3004609374599232111}
+  m_GameObject: {fileID: 5956125047226659493}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.22, y: 1.14, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalScale: {x: 5, y: 5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &5940548332283951501
+--- !u!212 &2473970178893423521
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3004609374599232111}
+  m_GameObject: {fileID: 5956125047226659493}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -75,9 +75,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 37c6ef68ae89444449fa2831a983bb9b, type: 3}
-  m_Color: {r: 0.5139716, g: 0.15574935, b: 0.9433962, a: 1}
+  m_SortingOrder: 2
+  m_Sprite: {fileID: 21300000, guid: d74318faccd3cfd4792a285e705fc5c5, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -87,14 +87,87 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!50 &641576626602978614
+--- !u!114 &3900023798022020368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5956125047226659493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f66e9a5f7ecfa4044817717355f219a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameManager: {fileID: 0}
+  isSpawnTime: 0
+  moveSpeed: 0
+  maxHP: 200
+  curHP: 0
+  hitTime: 0
+  damage: 1
+  haveCoin: 500
+  isBoss: 1
+  isElite: 0
+  bossHPImage: {fileID: 0}
+  objItem: {fileID: 0}
+  bossPatterns:
+  - objPattern: {fileID: 0}
+    patternName: 0
+    setRepeatNum: 3
+    curRepeatNum: 0
+    setDelayTime: 1
+    curDelayTime: 0
+    startPattern: 0
+    rePattern: 0
+    usedPattern: 0
+  - objPattern: {fileID: 6463079231239714820, guid: bcfa4bc2a3bafde44bc942b6d68cf240, type: 3}
+    patternName: 1
+    setRepeatNum: 3
+    curRepeatNum: 0
+    setDelayTime: 1
+    curDelayTime: 0
+    startPattern: 0
+    rePattern: 0
+    usedPattern: 0
+  - objPattern: {fileID: 2342258238109649859, guid: 00e841c773e7aea4fab3687ced5a4d1e, type: 3}
+    patternName: 2
+    setRepeatNum: 3
+    curRepeatNum: 0
+    setDelayTime: 0.5
+    curDelayTime: 0
+    startPattern: 0
+    rePattern: 0
+    usedPattern: 0
+  - objPattern: {fileID: 1927974737325780717, guid: 16faf18b067e9c3498cb70c0f0563feb, type: 3}
+    patternName: 3
+    setRepeatNum: 3
+    curRepeatNum: 0
+    setDelayTime: 0
+    curDelayTime: 0
+    startPattern: 0
+    rePattern: 0
+    usedPattern: 0
+  lavaRange: 0
+  fireLineSpawnPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  bossPhase: 1
+  isGrog: 0
+  pokeSpeed: 65
+  setGrogTime: 3
+  curGrogTime: 0
+  setDelayTime: 2
+  curDelayTime: 0
+  testStart: 0
+--- !u!50 &3007309040838937678
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3004609374599232111}
+  m_GameObject: {fileID: 5956125047226659493}
   m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
@@ -114,13 +187,13 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 7
---- !u!61 &6532485069669086195
+--- !u!61 &7246248274108257627
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3004609374599232111}
+  m_GameObject: {fileID: 5956125047226659493}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -146,40 +219,16 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.009427942, y: -0.0016602278}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.99, y: 1.29}
+    oldSize: {x: 0.64, y: 0.64}
     newSize: {x: 0.99, y: 1.29}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.99, y: 1.29}
+  m_Size: {x: 0.41681063, y: 0.61599207}
   m_EdgeRadius: 0
---- !u!114 &5839075952822643441
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3004609374599232111}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 200902f63294e7d4db0eaddb9816bede, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameManager: {fileID: 0}
-  isSpawnTime: 1
-  moveSpeed: 3
-  maxHP: 20
-  curHP: 0
-  hitTime: 0
-  damage: 1
-  haveCoin: 10
-  isBoss: 0
-  isElite: 0
-  bossHPImage: {fileID: 0}
-  objItem: {fileID: 548491098324783014, guid: f81868cc2b16d104d92743529208cb78, type: 3}

@@ -29,7 +29,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     private void Update()
     {
-        if (item == null)
+        if (itemImage == null)
         {
             objItemImage.SetActive(false); //아이템이 들어있지 않은 경우 이미지 끄기
         }

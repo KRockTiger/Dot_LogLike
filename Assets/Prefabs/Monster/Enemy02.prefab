@@ -174,7 +174,7 @@ MonoBehaviour:
   gameManager: {fileID: 0}
   isSpawnTime: 1
   moveSpeed: 3
-  maxHP: 10
+  maxHP: 20
   curHP: 0
   hitTime: 0
   damage: 1

@@ -12,13 +12,23 @@ public class Item : MonoBehaviour
         artifact, //장비
     }
 
+    public enum ValueType
+    {
+        damage,
+        move,
+        hp,
+        maxHP,
+    }
+
     [Header("아이템 정보")]
-    [SerializeField] private SpriteRenderer itemSprite; //아이템 스프라이트
-    [SerializeField] private ItemType itemType; //아이템 종류
-    [SerializeField] private string itemName; //아이템 이름
-    [SerializeField] private string itemDescription; //아이템 설명
-    [SerializeField] private int intValue; //int형 밸류값 ==> 주로 체력관련 사용
-    [SerializeField] private float floatValue; //float형 밸류값 ==> 주로 공격력관련 사용
+    public ItemType itemType; //아이템 종류
+    public ValueType valueType;
+    public Sprite itemSprite;
+    public string itemName; //아이템 이름
+    public string itemDescription; //아이템 설명
+    public int intValue; //int형 밸류값 ==> 주로 체력관련 사용
+    public float floatValue; //float형 밸류값 ==> 주로 공격력관련 사용
+    public bool isHave = false; //유물형 아이템일 경우 소지 유무 판단
 
     /// <summary>
     /// 아이템 종류 적용

@@ -47,17 +47,19 @@ public class Player : MonoBehaviour
 
     [Header("플레이어 스탯")]
     [SerializeField] private float moveSpeed = 10f; //일반 이동속도
+    [SerializeField] private float defMoveSpeed = 10f; //일반 이동속도
     [SerializeField] private float dashSpeed = 10f; //대쉬 이동속도
-    [SerializeField] private float damage = 2f; //대쉬 이동속도
+    [SerializeField] private float damage = 2f; //현재 공격력
+    [SerializeField] private float defDamage = 2f; //일반 공격력
     [SerializeField] private GameObject[] hearts; //하트 UI를 담을 오브젝트 배열
     [SerializeField] private int curHP; //현재 체력
     [SerializeField] private int maxHP; //최대 체력
-    private int setMaxHP = 5; //설정 가능한 최대 체력 ==> 최대 체력 증가 아이템을 먹었을 경우 막기 위한 코드
+    private int setMaxHP = 4; //설정 가능한 최대 체력 ==> 최대 체력 증가 아이템을 먹었을 경우 막기 위한 코드
 
     [Header("플레이어 상태")]
     [SerializeField] private bool isPassDamage = false; //대쉬 중 무적효과를 적용
     [SerializeField] private bool passMode = false; //한번 피격을 당하면 1초동안 무적효과를 적용
-    [SerializeField] private bool isKey = false; //키 소지 여부
+    //[SerializeField] private bool isKey = false; //키 소지 여부
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -88,8 +90,8 @@ public class Player : MonoBehaviour
 
         if (collision.tag == "Key")
         {
-            isKey = true;
-            gameManager.PSetBossKey();
+            //isKey = true;
+            gameManager.PSetWaitBoss();
             Destroy(collision.gameObject);
         }
     }
@@ -401,7 +403,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void HeartCheck()
     {
-        if (curHP <= -1 || curHP > setMaxHP) //설정된 체력보다 오버될 경우
+        if (curHP <= -1 || curHP > maxHP) //설정된 체력보다 오버될 경우
         {
             Debug.Log("설정한 체력보다 오버됬습니다.");
             return;
@@ -479,6 +481,26 @@ public class Player : MonoBehaviour
     public void PSetCursor(bool _set)
     {
         curSor.gameObject.SetActive(_set);
+    }
+
+    public void PGetDamage(float _damage)
+    {
+        damage = defDamage + _damage;
+    }
+    
+    public void PGetMove(float _move)
+    {
+        moveSpeed = defMoveSpeed + _move;
+    }
+    
+    public void PGetHP(int _hp)
+    {
+        curHP += _hp;
+    }
+
+    public void PGetMaxHP(int _maxHP)
+    {
+        maxHP = setMaxHP + _maxHP;
     }
 
     /// <summary>

@@ -19,6 +19,7 @@ public class Player : MonoBehaviour
     private Quaternion rotTarget;
     private bool isRight;
     [SerializeField] private bool isDash;
+    [SerializeField] private bool testMode;
     private SpriteRenderer spRenderer; //현재 스프라이트
     private Color defColor; //일반 스프라이트 색
     private Color passColor; //무적용 스프라이트 색
@@ -47,17 +48,19 @@ public class Player : MonoBehaviour
 
     [Header("플레이어 스탯")]
     [SerializeField] private float moveSpeed = 10f; //일반 이동속도
+    [SerializeField] private float defMoveSpeed = 10f; //일반 이동속도
     [SerializeField] private float dashSpeed = 10f; //대쉬 이동속도
-    [SerializeField] private float damage = 2f; //대쉬 이동속도
+    [SerializeField] private float damage = 2f; //현재 공격력
+    [SerializeField] private float defDamage = 2f; //일반 공격력
     [SerializeField] private GameObject[] hearts; //하트 UI를 담을 오브젝트 배열
     [SerializeField] private int curHP; //현재 체력
     [SerializeField] private int maxHP; //최대 체력
-    private int setMaxHP = 5; //설정 가능한 최대 체력 ==> 최대 체력 증가 아이템을 먹었을 경우 막기 위한 코드
+    private int setMaxHP = 4; //설정 가능한 최대 체력 ==> 최대 체력 증가 아이템을 먹었을 경우 막기 위한 코드
 
     [Header("플레이어 상태")]
     [SerializeField] private bool isPassDamage = false; //대쉬 중 무적효과를 적용
     [SerializeField] private bool passMode = false; //한번 피격을 당하면 1초동안 무적효과를 적용
-    [SerializeField] private bool isKey = false; //키 소지 여부
+    //[SerializeField] private bool isKey = false; //키 소지 여부
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -88,8 +91,8 @@ public class Player : MonoBehaviour
 
         if (collision.tag == "Key")
         {
-            isKey = true;
-            gameManager.PSetBossKey();
+            //isKey = true;
+            gameManager.PSetWaitBoss();
             Destroy(collision.gameObject);
         }
     }
@@ -113,6 +116,10 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            testMode = !testMode;
+        }
         CheckMouse();
         Moving();
         CheckPosition();
@@ -152,6 +159,9 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Moving()
     {
+        if (gameManager.PGamePause())
+        { return; }
+
         if (isDash) //대쉬가 켜질경우 if문 안에 있는 Dash함수 사용하며 아래 코드에 접근 못하게 막기
         {
             Dash();
@@ -201,6 +211,9 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Turning()
     {
+        if (gameManager.PGamePause())
+        { return; }
+
         Vector3 scale = transform.localScale;
 
         if (moveX < 0f)
@@ -262,6 +275,9 @@ public class Player : MonoBehaviour
     /// <param 스킬 키코드="_skillKey">스킬 키코드</param>
     private void PlayerSkills(KeyCode _skillKey)
     {
+        if (gameManager.PGamePause())
+        { return; }
+
         switch (_skillKey)
         {
             case KeyCode.Q:
@@ -401,7 +417,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void HeartCheck()
     {
-        if (curHP <= -1 || curHP > setMaxHP) //설정된 체력보다 오버될 경우
+        if (curHP <= -1 || curHP > maxHP) //설정된 체력보다 오버될 경우
         {
             Debug.Log("설정한 체력보다 오버됬습니다.");
             return;
@@ -441,7 +457,7 @@ public class Player : MonoBehaviour
     /// </summary>
     public void PHit(int _damage)
     {
-        if (isPassDamage || passMode)
+        if (isPassDamage || passMode || testMode)
         {
             Debug.Log($"현재 보호를 받는 상태입니다.");
             return;
@@ -479,6 +495,26 @@ public class Player : MonoBehaviour
     public void PSetCursor(bool _set)
     {
         curSor.gameObject.SetActive(_set);
+    }
+
+    public void PGetDamage(float _damage)
+    {
+        damage = defDamage + _damage;
+    }
+    
+    public void PGetMove(float _move)
+    {
+        moveSpeed = defMoveSpeed + _move;
+    }
+    
+    public void PGetHP(int _hp)
+    {
+        curHP += _hp;
+    }
+
+    public void PGetMaxHP(int _maxHP)
+    {
+        maxHP = setMaxHP + _maxHP;
     }
 
     /// <summary>

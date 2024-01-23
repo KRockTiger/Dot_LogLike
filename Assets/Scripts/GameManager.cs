@@ -23,6 +23,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject gamePauseUI;
     [SerializeField] private GameObject gameOverUI;
     [SerializeField] private GameObject gameClearUI;
+    [SerializeField] private GameObject shopObj;
+    [SerializeField] private GameObject checkShopUI;
     private bool isInventory = false;
 
     [Header("몬스터 관리")]
@@ -71,6 +73,11 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            coin += 100;
+        }
+
         if (gameStart)
         {
             keyManual.SetActive(false);
@@ -119,16 +126,23 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void GameCheck()
     {
-        if (gameEnd || gamePause)
+        if (gameOverUI.activeSelf || gameClearUI.activeSelf || inventoryUI.activeSelf)
         {
+            gamePause = true;
             Time.timeScale = 0f;
             Cursor.visible = true;
         }
 
-        else if (!gameEnd && !gamePause)
+        else if (!gameOverUI.activeSelf && !gameClearUI.activeSelf && !inventoryUI.activeSelf)
         {
+            gamePause = false;
             Time.timeScale = 1f;
             Cursor.visible = false;
+        }
+
+        if (checkShopUI.activeSelf)
+        {
+            Cursor.visible = true;
         }
     }
 
@@ -137,12 +151,12 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void InventoryUI()
     {
-        if (Input.GetKeyDown(KeyCode.B)) //키를 누를때마다 변경
+        if (Input.GetKeyDown(KeyCode.C)) //키를 누를때마다 변경
         {
             gamePause = !gamePause;
             isInventory = !isInventory;
         }
-        inventoryUI.SetActive(gamePause);
+        inventoryUI.SetActive(isInventory);
     }
 
     /// <summary>
@@ -305,9 +319,10 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// 키 활성화
     /// </summary>
-    public void PSetBossKey()
+    public void PSetWaitBoss()
     {
         startBossKey.SetActive(true);
+        shopObj.SetActive(true);
     }
 
     /// <summary>
@@ -340,6 +355,25 @@ public class GameManager : MonoBehaviour
     public void PClearGame()
     {
         gameClearUI.SetActive(true);
+    }
+
+    /// <summary>
+    /// 게임 매니저가 가지고 있는 코인을 공유
+    /// </summary>
+    /// <returns></returns>
+    public int PCoin()
+    {
+        return coin;
+    }
+
+    public void PUseCoin(int _coin)
+    {
+        coin -= _coin;
+    }
+
+    public bool PGamePause()
+    {
+        return gamePause;
     }
 
     /// <summary>

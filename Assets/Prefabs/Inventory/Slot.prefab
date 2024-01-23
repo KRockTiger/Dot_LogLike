@@ -92,8 +92,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 919e0bb95dbb09a48a113eb7aa9fed20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 0}
   item: {fileID: 0}
-  itemImage: {fileID: 0}
   objHighlight: {fileID: 8913231106192770758}
   objItemImage: {fileID: 6271045758288226077}
 --- !u!1 &6271045758288226077
@@ -260,7 +260,7 @@ GameObject:
   - component: {fileID: 2665354316892120600}
   - component: {fileID: 603502467449850552}
   m_Layer: 5
-  m_Name: ItemImage
+  m_Name: FramHighlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -335,7 +335,6 @@ GameObject:
   - component: {fileID: 2528242235440054237}
   - component: {fileID: 8556097233236169890}
   - component: {fileID: 2812338167586876584}
-  - component: {fileID: 2579396185986234939}
   m_Layer: 5
   m_Name: HighlightImage
   m_TagString: Untagged
@@ -402,19 +401,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2579396185986234939
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8913231106192770758}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 919e0bb95dbb09a48a113eb7aa9fed20, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  item: {fileID: 0}
-  itemImage: {fileID: 0}
-  objHighlight: {fileID: 0}
-  objItemImage: {fileID: 0}

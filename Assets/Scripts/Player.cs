@@ -19,6 +19,7 @@ public class Player : MonoBehaviour
     private Quaternion rotTarget;
     private bool isRight;
     [SerializeField] private bool isDash;
+    [SerializeField] private bool testMode;
     private SpriteRenderer spRenderer; //현재 스프라이트
     private Color defColor; //일반 스프라이트 색
     private Color passColor; //무적용 스프라이트 색
@@ -115,6 +116,10 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            testMode = !testMode;
+        }
         CheckMouse();
         Moving();
         CheckPosition();
@@ -154,6 +159,9 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Moving()
     {
+        if (gameManager.PGamePause())
+        { return; }
+
         if (isDash) //대쉬가 켜질경우 if문 안에 있는 Dash함수 사용하며 아래 코드에 접근 못하게 막기
         {
             Dash();
@@ -203,6 +211,9 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Turning()
     {
+        if (gameManager.PGamePause())
+        { return; }
+
         Vector3 scale = transform.localScale;
 
         if (moveX < 0f)
@@ -264,6 +275,9 @@ public class Player : MonoBehaviour
     /// <param 스킬 키코드="_skillKey">스킬 키코드</param>
     private void PlayerSkills(KeyCode _skillKey)
     {
+        if (gameManager.PGamePause())
+        { return; }
+
         switch (_skillKey)
         {
             case KeyCode.Q:
@@ -443,7 +457,7 @@ public class Player : MonoBehaviour
     /// </summary>
     public void PHit(int _damage)
     {
-        if (isPassDamage || passMode)
+        if (isPassDamage || passMode || testMode)
         {
             Debug.Log($"현재 보호를 받는 상태입니다.");
             return;

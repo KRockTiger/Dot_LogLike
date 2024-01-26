@@ -8,8 +8,12 @@ public class StartKey : MonoBehaviour
 
     [SerializeField] private GameObject fKey;
     [SerializeField] private bool bossKey;
+    [SerializeField] private bool tBossKey;
     [SerializeField] private GameObject testBossKey;
+    [SerializeField] private GameObject startKey;
+    [SerializeField] private GameObject manualKey;
     [SerializeField] private GameObject shopObj;
+
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -50,6 +54,15 @@ public class StartKey : MonoBehaviour
                 gameManager.PSetBoss();
                 gameObject.SetActive(false);
                 shopObj.SetActive(false);
+            }
+
+            if (Input.GetKeyDown(KeyCode.F) && tBossKey)
+            {
+                gameManager.PSetBoss();
+                gameObject.SetActive(false);
+                shopObj.SetActive(false);
+                manualKey.SetActive(false);
+                startKey.SetActive(false);
             }
         }
     }

@@ -128,12 +128,14 @@ public class GameManager : MonoBehaviour
     {
         if (gameOverUI.activeSelf || gameClearUI.activeSelf || inventoryUI.activeSelf)
         {
+            gamePause = true;
             Time.timeScale = 0f;
             Cursor.visible = true;
         }
 
         else if (!gameOverUI.activeSelf && !gameClearUI.activeSelf && !inventoryUI.activeSelf)
         {
+            gamePause = false;
             Time.timeScale = 1f;
             Cursor.visible = false;
         }
@@ -369,9 +371,9 @@ public class GameManager : MonoBehaviour
         coin -= _coin;
     }
 
-    public void PGamePause(bool _pause)
+    public bool PGamePause()
     {
-        gamePause = _pause;
+        return gamePause;
     }
 
     /// <summary>

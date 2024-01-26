@@ -606,7 +606,7 @@ public class BossEnemy : Enemy
     /// <summary>
     /// 버츄얼 함수 사용
     /// </summary>
-    public override void VDie()
+    protected override void VDie()
     {
         base.VDie();
     }

@@ -68,6 +68,7 @@ public class GameManager : MonoBehaviour
         gamePause = false;
         gameOverUI.SetActive(false);
         gameClearUI.SetActive(false);
+
         isInventory = false;
     }
 

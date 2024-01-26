@@ -241,7 +241,7 @@ public class Enemy : MonoBehaviour
     /// <summary>
     /// 몬스터 죽음 판정
     /// </summary>
-    public virtual void VDie()
+    protected virtual void VDie()
     {
         Destroy(gameObject); //오브젝트 파괴
 

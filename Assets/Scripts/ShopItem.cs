@@ -8,10 +8,10 @@ using TMPro;
 public class ShopItem : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     GameManager gameManager;
+    InventoryManager inventoryManager;
 
     [SerializeField] private Item item;
     [SerializeField] private int price;
-    [SerializeField] private Inventory inventory;
     [SerializeField] private Image itemImage;
     [SerializeField] private TMP_Text itemText;
     [SerializeField] private GameObject framImageObj;
@@ -36,7 +36,7 @@ public class ShopItem : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
 
                 if (item.itemType == Item.ItemType.artifact)
                 {
-                    inventory.PGetItem(item);
+                    inventoryManager.PGetItem(item);
                 }
 
                 else if (item.itemType != Item.ItemType.artifact)
@@ -78,6 +78,7 @@ public class ShopItem : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
     private void Start()
     {
         gameManager = GameManager.Instance;
+        inventoryManager = InventoryManager.Instance;
     }
 
     
